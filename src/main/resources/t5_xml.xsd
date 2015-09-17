@@ -1,0 +1,482 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<xs:schema elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:t5="http://sll-mdilab.net/T5/" targetNamespace="http://sll-mdilab.net/T5/">
+    <xs:element name="PCD_01_Message" type="t5:PCD_01_Message"> </xs:element>
+    <xs:element name="Patient_Result" type="t5:Patient_Result"> </xs:element>
+    <xs:element name="Patient" type="t5:Patient"> </xs:element>
+    <xs:element name="Order_Observations" type="t5:Order_Observations"> </xs:element>
+    <xs:element name="Order" type="t5:Order"> </xs:element>
+    <xs:element name="MDS" type="t5:MDS"> </xs:element>
+    <xs:element name="VMD" type="t5:VMD"> </xs:element>
+    <xs:element name="CHAN" type="t5:CHAN"> </xs:element>
+    <xs:element name="Facet" type="t5:Facet"/>
+    <xs:element name="Metric" type="t5:Metric"> </xs:element>
+    <xs:element name="Observation" type="t5:Observation"> </xs:element>
+    <xs:element name="Identifier">
+        <xs:annotation>
+            <xs:documentation>PID-3.1</xs:documentation>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:simpleContent>
+                <xs:extension base="xs:string">
+                    <xs:attribute name="authority" use="required">
+                        <xs:annotation>
+                            <xs:documentation>PID-3.4</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="typeCode">
+                        <xs:annotation>
+                            <xs:documentation>PID-3.5</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Timestamp" type="t5:Timestamp">
+        <xs:annotation>
+            <xs:documentation>is extracted from parent OBR-7 or from narrowest OBX-14 (in terms of containment tree)</xs:documentation>
+        </xs:annotation>
+    </xs:element>
+    <xs:element name="Method">
+        <xs:complexType/>
+    </xs:element>
+    <xs:element name="Body_Site">
+        <xs:complexType/>
+    </xs:element>
+    <xs:element name="Status">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="t5:Abnormal_Flag"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Abnormal_Flag">
+        <xs:complexType/>
+    </xs:element>
+    <xs:element name="Result">
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="xs:string">
+                    <xs:attribute name="unit"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Value" default="">
+        <xs:complexType mixed="true">
+            <xs:simpleContent>
+                <xs:extension base="xs:string">
+                    <xs:attribute name="typeHL7v2" type="xs:string" use="optional"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Unit" type="t5:Unit"> </xs:element>
+    <xs:element name="EquipmentIdentifier" type="t5:EquipmentIdentifier">
+        <xs:annotation>
+            <xs:documentation>OBX-18</xs:documentation>
+            <xs:documentation>OBX-18.1</xs:documentation>
+        </xs:annotation>
+    </xs:element>
+    <xs:element name="Note">
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="xs:string"/>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="Facet">
+        <xs:annotation>
+            <xs:documentation>This Device Containment Tree component/level is defined in IHE PCD WCM supplement
+http://ihe.net/Technical_Framework/upload/IHE_PCD_Suppl_WCM.pdf</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element ref="t5:Observation"/>
+        </xs:sequence>
+        <xs:attribute name="index" form="unqualified" type="xs:int">
+            <xs:annotation>
+                <xs:documentation>index in ContainmentTree, extracted from OBX-4</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="id">
+            <xs:annotation>
+                <xs:documentation>OBX-3.2 extracted from segmnent where OBX-4 is x.y.z.w.t</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+    <xs:complexType name="Observation">
+        <xs:sequence>
+            <xs:element name="ObsIdentifier" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>OBX-3</xs:documentation>
+                    <xs:documentation>OBX-3.2 text</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:simpleContent>
+                        <xs:extension base="xs:string">
+                            <xs:attribute name="id" use="required">
+                                <xs:annotation>
+                                    <xs:documentation>OBX-3.1</xs:documentation>
+                                </xs:annotation>
+                            </xs:attribute>
+                            <xs:attribute name="codingSystemName" type="xs:string" use="required">
+                                <xs:annotation>
+                                    <xs:documentation>OBX-3.3</xs:documentation>
+                                </xs:annotation>
+                            </xs:attribute>
+                            <xs:attribute name="isAlternate" type="xs:boolean"/>
+                            <xs:attribute name="notFound" type="xs:boolean">
+                                <xs:annotation>
+                                    <xs:documentation>flag to be set if the identifier term could not be found in the nomenclature (i.e. can not be found in IEEE/IHE Rosetta table)</xs:documentation>
+                                </xs:annotation>
+                            </xs:attribute>
+                        </xs:extension>
+                    </xs:simpleContent>
+                </xs:complexType>
+            </xs:element>
+            <xs:element ref="t5:Value" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>OBX-5</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element ref="t5:Unit">
+                <xs:annotation>
+                    <xs:documentation>OBX-6
+</xs:documentation>
+                    <xs:documentation>OBX-6.2</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element ref="t5:Timestamp" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>is extracted from parent OBR-7 or from narrowest OBX-14 (in terms of containment tree)</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element ref="t5:Method" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>OBX-17</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element ref="t5:Body_Site" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>OBX-20</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element ref="t5:Status" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>OBX-11</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" ref="t5:EquipmentIdentifier"/>
+            <xs:element ref="t5:Note" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="uid">
+            <xs:annotation>
+                <xs:documentation>GUID genereted at the recieval</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="hierarchy" type="xs:string">
+            <xs:annotation>
+                <xs:documentation>OBX-4</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="index" form="unqualified" type="xs:int">
+            <xs:annotation>
+                <xs:documentation>index in ContainmentTree, extracted from OBX-4</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="setid" type="xs:string">
+            <xs:annotation>
+                <xs:documentation>OBX-1 should be unique for OBX in entire message</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="violatesIHE" type="xs:boolean" use="optional">
+            <xs:annotation>
+                <xs:documentation>flag to mark OBX which violates IHE PCD profile restrictions
+</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+    <xs:complexType name="Metric">
+        <xs:sequence maxOccurs="unbounded">
+            <xs:element name="Facet" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element ref="t5:Observation"/>
+                    </xs:sequence>
+                    <xs:attribute name="index" form="unqualified" type="xs:int">
+                        <xs:annotation>
+                            <xs:documentation>index in ContainmentTree, extracted from OBX-4</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="id">
+                        <xs:annotation>
+                            <xs:documentation>OBX-3.2 extracted from segmnent where OBX-4 is x.y.z.w.t</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:complexType>
+            </xs:element>
+            <xs:element ref="t5:Observation" maxOccurs="unbounded" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>OBX</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="index" form="unqualified" type="xs:int">
+            <xs:annotation>
+                <xs:documentation>index in ContainmentTree, extracted from OBX-4</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="id">
+            <xs:annotation>
+                <xs:documentation>OBX-3.2 extracted from segment where OBX-4 is x.y.z.w</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+    <xs:complexType name="Unit">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="id" use="required">
+                    <xs:annotation>
+                        <xs:documentation>OBX-6.1</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="codingSystemName" type="xs:string" use="required">
+                    <xs:annotation>
+                        <xs:documentation>OBX-6.3</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="CHAN">
+        <xs:sequence maxOccurs="unbounded">
+            <xs:element ref="t5:Metric" minOccurs="0"/>
+            <xs:element ref="t5:Observation" maxOccurs="unbounded" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>OBX</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="index" form="unqualified" type="xs:int">
+            <xs:annotation>
+                <xs:documentation>index in ContainmentTree, extracted from OBX-4</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="id">
+            <xs:annotation>
+                <xs:documentation>OBX-3.2 extracted from segment where OBX-4 is x.y.z.0</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+    <xs:complexType name="VMD">
+        <xs:sequence maxOccurs="unbounded">
+            <xs:element ref="t5:CHAN" minOccurs="0"/>
+            <xs:element ref="t5:Observation" maxOccurs="unbounded" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="index" form="unqualified" type="xs:int">
+            <xs:annotation>
+                <xs:documentation>index in ContainmentTree, extarcted from OBX-4</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="id">
+            <xs:annotation>
+                <xs:documentation>OBX-3.2 extracted from segment where OBX-4 is x.y.0.0</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+    <xs:complexType name="MDS">
+        <xs:sequence maxOccurs="unbounded">
+            <xs:element ref="t5:VMD" maxOccurs="1" minOccurs="0"/>
+            <xs:element ref="t5:Observation" maxOccurs="unbounded" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="index" form="unqualified" type="xs:int">
+            <xs:annotation>
+                <xs:documentation>index in ContainmentTree, extarcted from OBX-4</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="id">
+            <xs:annotation>
+                <xs:documentation>OBX-3.2 extracted from segment where OBX-4 is x.0.0.0</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+    <xs:complexType name="Order">
+        <xs:sequence>
+            <xs:element name="FillerOrderNumber" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>OBR-3.1</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:attribute name="idLocal" use="optional">
+                        <xs:annotation>
+                            <xs:documentation>OBR-3.1</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="nameSpaceID" type="xs:string">
+                        <xs:annotation>
+                            <xs:documentation>OBR-3.2</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="idUniversal">
+                        <xs:annotation>
+                            <xs:documentation>OBR-3.3</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="idUniversalType">
+                        <xs:annotation>
+                            <xs:documentation>MSH-3.4</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="UniversalServiceID" maxOccurs="1" minOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>OBR-4.2 text</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:attribute name="id" use="optional">
+                        <xs:annotation>
+                            <xs:documentation>OBR-4.1 id</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="codingSystemName" type="xs:string" use="optional">
+                        <xs:annotation>
+                            <xs:documentation>OBR-4.3</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="timeStamp" type="xs:dateTime">
+            <xs:annotation>
+                <xs:documentation>OBR-7</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+    <xs:complexType name="Order_Observations">
+        <xs:sequence minOccurs="0">
+            <xs:element ref="t5:Order" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>OBR</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element ref="t5:MDS" maxOccurs="unbounded" minOccurs="0"/>
+            <xs:element ref="t5:Note" maxOccurs="unbounded" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>NTE</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="Patient">
+        <xs:sequence minOccurs="0">
+            <xs:element ref="t5:Identifier" maxOccurs="6">
+                <xs:annotation>
+                    <xs:documentation>PID-3</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="Name">
+                <xs:annotation>
+                    <xs:documentation>PID-5</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="Patient_Result">
+        <xs:sequence>
+            <xs:element ref="t5:Patient">
+                <xs:annotation>
+                    <xs:documentation>PID</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element ref="t5:Order_Observations" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="PCD_01_Message">
+        <xs:annotation>
+            <xs:documentation>HL7 v2 message as defined in IHE PCD profile
+http://ihe.net/uploadedFiles/Documents/PCD/IHE_PCD_TF_Vol1.pdf
+http://ihe.net/uploadedFiles/Documents/PCD/IHE_PCD_TF_Vol2.pdf
+http://ihe.net/uploadedFiles/Documents/PCD/IHE_PCD_TF_Vol3.pdf</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="Sending_Application">
+                <xs:annotation>
+                    <xs:documentation>MSH-3
+MSH-3.1 is used as Application ID, which is an identifier of the System
+</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:attribute name="idLocal" use="optional">
+                        <xs:annotation>
+                            <xs:documentation>MSH-3.1</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="idUniversal">
+                        <xs:annotation>
+                            <xs:documentation>MSH-3.2</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="idUniversalType">
+                        <xs:annotation>
+                            <xs:documentation>MSH-3.3</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="Sending_Facility">
+                <xs:annotation>
+                    <xs:documentation>MSH-4
+</xs:documentation>
+                    <xs:documentation>to distinguish Hospital/department</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:attribute name="idLocal" use="optional">
+                        <xs:annotation>
+                            <xs:documentation>MSH-4.1</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="idUniversal">
+                        <xs:annotation>
+                            <xs:documentation>MSH-4.2</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="idUniversalType">
+                        <xs:annotation>
+                            <xs:documentation>MSH-4.3</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:complexType>
+            </xs:element>
+            <xs:element ref="t5:Patient_Result" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="timeStamp" type="xs:dateTime">
+            <xs:annotation>
+                <xs:documentation>MSH-7</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="id" type="xs:string">
+            <xs:annotation>
+                <xs:documentation>MSH-10
+</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+    <xs:complexType name="EquipmentIdentifier">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="nameSpaceID" type="xs:string">
+                    <xs:annotation>
+                        <xs:documentation>OBX-18.2</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="Timestamp">
+        <xs:simpleContent>
+            <xs:extension base="xs:dateTime"/>
+        </xs:simpleContent>
+    </xs:complexType>
+</xs:schema>

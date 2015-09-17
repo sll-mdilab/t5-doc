@@ -1,0 +1,110 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'application'
+
+sourceCompatibility = 1.8
+version = '0.1'
+
+def camelVersion = "2.15.2"
+
+configurations.all {
+    resolutionStrategy.eachDependency {
+        if(it.requested.name == 'commons-logging') {
+            it.useTarget 'org.slf4j:jcl-over-slf4j:1.7.10'
+        }
+        if (it.requested.name == 'log4j') {
+            it.useTarget 'org.slf4j:log4j-over-slf4j:1.7.10'
+        }
+    }
+    exclude module: 'slf4j-log4j12'
+}
+
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'T5 PoC', 'Implementation-Version': version, 'Main-Class': 'net.sllmdilab.t5.T5BackendApplication'
+    }
+    //from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+}
+
+task fatJar(type: Jar) {
+	manifest {
+        attributes 'Implementation-Title': 'T5 PoC', 'Implementation-Version': version, 'Main-Class': 'net.sllmdilab.t5.T5BackendApplication'
+    }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.2.1'
+}
+
+repositories {
+    mavenCentral()
+    maven {
+    	url 'http://developer.marklogic.com/maven2'
+    }
+    flatDir {
+    	dirs '../t5-repo'
+    }
+    flatDir {
+    	dirs 'lib'
+    }
+}
+
+
+sourceSets {
+	integrationTest {
+	 	java.srcDir file('src/integrationtest/java')
+	    resources.srcDir file('src/integrationtest/resources')
+	    
+	    compileClasspath += sourceSets.main.runtimeClasspath
+	}
+}
+
+
+task integrationTest(type: Test) {
+    testClassesDir = sourceSets.integrationTest.output.classesDir
+    classpath = sourceSets.integrationTest.runtimeClasspath
+}
+
+//check.dependsOn integrationTest
+
+dependencies {
+	compile 'org.slf4j:slf4j-api:1.7.10'
+    compile 'ch.qos.logback:logback-classic:1.1.2'
+    compile 'ch.qos.logback:logback-core:1.1.2'
+    compile 'org.slf4j:jcl-over-slf4j:1.7.10'
+    compile 'org.slf4j:log4j-over-slf4j:1.7.10'
+    
+    compile 'commons-collections:commons-collections:3.2'
+    compile 'org.apache.camel:camel-core:' + camelVersion
+    compile 'org.apache.camel:camel-hl7:' + camelVersion
+    compile 'org.apache.camel:camel-spring-javaconfig:' + camelVersion
+    compile 'org.apache.camel:camel-http4:' + camelVersion
+    compile 'org.apache.camel:camel-netty4:' + camelVersion
+    
+    compile 'ca.uhn.hapi:hapi-structures-v26:2.2'
+    compile 'ca.uhn.hapi:hapi-structures-v23:2.2'
+    compile 'ca.uhn.hapi:hapi-structures-v251:2.2'
+    compile 'com.marklogic:client-api-java:2.0-1'
+    compile 'com.marklogic:marklogic-xcc:7.0.4'
+    compile 'org.apache.jena:jena-core:2.13.0'
+    compile 'org.apache.jena:jena-arq:2.13.0'
+    compile 'net.sf.opencsv:opencsv:2.3'
+    compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.6.1'
+    
+    compile name: 't5-commons-1.0'
+    compile name: 'virt_jena2'
+    compile name: 'virtjdbc4'
+    
+    testCompile 'junit:junit:4.+'
+    testCompile 'org.apache.camel:camel-test-spring:' + camelVersion
+    testCompile 'org.apache.camel:camel-spring:' + camelVersion
+    testCompile 'org.mockito:mockito-core:1.+'
+    
+    integrationTestCompile 'junit:junit:4.+'
+    integrationTestCompile 'org.apache.camel:camel-test-spring:' + camelVersion
+    integrationTestCompile 'org.apache.camel:camel-spring:' + camelVersion
+    integrationTestCompile 'org.mockito:mockito-core:1.+' 
+}
