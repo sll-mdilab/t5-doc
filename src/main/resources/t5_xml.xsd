@@ -1,6 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <xs:schema elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:t5="http://sll-mdilab.net/T5/" targetNamespace="http://sll-mdilab.net/T5/">
+    <xs:annotation>
+        <xs:documentation>T5 observations</xs:documentation>
+    </xs:annotation>
     <xs:element name="PCD_01_Message" type="t5:PCD_01_Message"> </xs:element>
     <xs:element name="Patient_Result" type="t5:Patient_Result"> </xs:element>
     <xs:element name="Patient" type="t5:Patient"> </xs:element>
