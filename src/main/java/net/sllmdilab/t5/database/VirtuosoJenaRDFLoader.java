@@ -47,10 +47,10 @@ public class VirtuosoJenaRDFLoader {
 		String unique_graph = graph + "_" + now;
 
 		Date dtNow = new Date(now);
-		String xmlNow = convertDateToXMLType(dtNow);
+		String xmlNow = convertDateToXMLTypeWithZ(dtNow);
+		
 		// Timestamp triple of graph creation
 		String tsTriple = "<" + unique_graph + "> <http://sll-mdilab.net/T5#time_created> '" + xmlNow + "'^^xsd:dateTime .";
-
 		String queryTemplate = "INSERT INTO <" + unique_graph + ">\n{\n_TRIPLES_\n" + tsTriple + "\n}\nWHERE {}";
 
 		long start = System.currentTimeMillis();
@@ -77,13 +77,13 @@ public class VirtuosoJenaRDFLoader {
 		logger.info("loaded in:" + (System.currentTimeMillis() - start) + " msec");
 	}
 
-	private String convertDateToXMLType(Date date) {
+	private String convertDateToXMLTypeWithZ(Date date) {
 
 		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(Constants.ISO_DATE_FORMAT).withZone(
 				ZoneId.of("UTC"));
 
 		ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(date.toInstant(), ZoneId.of("UTC"));
 
-		return zonedDateTime.format(dateTimeFormatter);
+		return zonedDateTime.format(dateTimeFormatter) + "Z";
 	}
 }
