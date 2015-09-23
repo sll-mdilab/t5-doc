@@ -12,6 +12,8 @@ import net.sllmdilab.t5.converters.XMLToRDFConverter;
 import org.apache.camel.component.hl7.HL7DataFormat;
 import org.apache.camel.component.hl7.HL7MLLPNettyDecoderFactory;
 import org.apache.camel.component.hl7.HL7MLLPNettyEncoderFactory;
+import org.apache.camel.dataformat.soap.SoapJaxbDataFormat;
+import org.apache.camel.dataformat.soap.name.ServiceInterfaceStrategy;
 import org.apache.camel.spring.javaconfig.CamelConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -141,4 +143,12 @@ public class ApplicationConfiguration extends CamelConfiguration {
 	public MLDBClient mldbClient() throws XccConfigException, URISyntaxException {
 		return new MLDBClient(contentSource());
 	}
+	
+	@Bean(name="rivtaObservationsDataFormat")
+	public SoapJaxbDataFormat soapJaxbDataFormat() {
+		return new SoapJaxbDataFormat(
+				"se.riv.clinicalprocess.healthcond.basic.getobservationsresponder.v1", new ServiceInterfaceStrategy(se.riv.clinicalprocess.healthcond.basic.getobservations.v1.rivtabp21.GetObservationsResponderInterface.class, false));
+	//soap.setVersion("1.0");
+	}
+	
 }
