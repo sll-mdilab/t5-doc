@@ -54,10 +54,19 @@ repositories {
 sourceSets {
 	integrationTest {
 	 	java.srcDir file('src/integrationtest/java')
-	    resources.srcDir file('src/integrationtest/resources')
-	    
-	    compileClasspath += sourceSets.main.runtimeClasspath
+	  resources.srcDir file('src/integrationtest/resources')
+	  compileClasspath += sourceSets.main.runtimeClasspath
 	}
+	
+  generated {
+    java {
+      srcDir 'src/generated/java'
+    }
+  }
+  
+  main {
+    compileClasspath += sourceSets.generated.runtimeClasspath
+  }
 }
 
 task integrationTest(type: Test) {
@@ -84,6 +93,7 @@ dependencies {
     compile 'ca.uhn.hapi:hapi-structures-v26:2.2'
     compile 'ca.uhn.hapi:hapi-structures-v23:2.2'
     compile 'ca.uhn.hapi:hapi-structures-v251:2.2'
+    compile 'ca.uhn.hapi.fhir:hapi-fhir-base:0.9'
     compile 'com.marklogic:client-api-java:2.0-1'
     compile 'com.marklogic:marklogic-xcc:7.0.4'
     compile 'org.apache.jena:jena-core:2.13.0'
