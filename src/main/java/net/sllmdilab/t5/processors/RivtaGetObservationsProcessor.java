@@ -40,6 +40,7 @@ public class RivtaGetObservationsProcessor implements Processor {
 
 	@Override
 	public void process(Exchange exchange) throws Exception {
+		
 		GetObservationsType request = (GetObservationsType) exchange.getIn().getBody();
 		logger.info("Called.");
 
@@ -82,31 +83,4 @@ public class RivtaGetObservationsProcessor implements Processor {
 		
 		return patient;
 	}
-
-	// private GetObservationsResponseType initMockResponse() {
-	// GetObservationsResponseType response = new GetObservationsResponseType();
-	// PatientType patient = new PatientType();
-	// patient.setName("Tolvan Tolvansson");
-	//
-	// IIType patientId = new IIType();
-	// patientId.setRoot("1212121212");
-	// patient.setId(patientId);
-	// ObservationGroupType observationGroup = new ObservationGroupType();
-	// observationGroup.setPatient(patient);
-	//
-	// ObservationType observation = new ObservationType();
-	// CVType type = new CVType();
-	// type.setCode("MDC_HEARD_BEAT_RATE");
-	// ValueANYType value = new ValueANYType();
-	// PQType pqType = new PQType();
-	// pqType.setValue(new BigDecimal(78.0));
-	// pqType.setUnit("MDC_BEATS_PER_MINUTE");
-	// value.setPq(pqType);
-	// observation.setType(type);
-	// observation.setValue(value);
-	// observationGroup.getObservation().add(observation);
-	// response.getObservationGroup().add(observationGroup);
-	//
-	// return response;
-	// }
 }

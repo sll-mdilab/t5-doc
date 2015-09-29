@@ -160,6 +160,10 @@ public class T5RouteBuilder extends RouteBuilder {
 			.to("log:hl7DeadLetter?level=INFO");
 		
 		from("jetty:http://0.0.0.0:8686/clinicalprocess/healthcond/basic/GetObservations/1/rivtabp21?enableJmx=true")
+				.onException(Exception.class)
+				    .handled(true)
+				    .marshal(rivtaObservationsDataFormat)
+				    .end()
 				.log(LoggingLevel.INFO, "Got SOAP request.")
 				.unmarshal(rivtaObservationsDataFormat)
 				.processRef("rivtaGetObservationsProcessor")

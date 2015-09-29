@@ -18,24 +18,46 @@ public class T5XmlToRivtaConverter {
 		ObservationType rivtaObs = new ObservationType();
 		
 		String obsTypeCode = t5Obs.getObsIdentifier().get(0).getValue();
-		CVType type = new CVType();
-		type.setCode(obsTypeCode);
-		rivtaObs.setType(type);
+		rivtaObs.setType(getType(obsTypeCode));
 		
 		String obsValue = t5Obs.getValue().get(0).getValue();
 		String obsUnit = t5Obs.getUnit().getValue();
-		//TODO: check if numeric
 		
-		ValueANYType value = new ValueANYType();
-		PQType pqType = new PQType();
-		pqType.setValue(new BigDecimal(obsValue));
-		pqType.setUnit(obsUnit);
-		value.setPq(pqType);
-		rivtaObs.setValue(value);
+		rivtaObs.setValue(getValue(obsValue, obsUnit));
 		
 		String obsTimestamp = t5Obs.getTimestamp().getValue().toXMLFormat();
 		rivtaObs.setRegistrationTime(obsTimestamp);
 		
 		return rivtaObs;
+	}
+
+	private CVType getType(String obsTypeCode) {
+		CVType type = new CVType();
+		type.setCode(obsTypeCode);
+		return type;
+	}
+
+	private ValueANYType getValue(String obsValue, String obsUnit) {
+		ValueANYType value = new ValueANYType();
+		if(isNumeric(obsValue)) {
+			PQType pqValue = new PQType();
+			pqValue.setValue(new BigDecimal(obsValue));
+			pqValue.setUnit(obsUnit);
+			value.setPq(pqValue);
+		} else {
+			CVType cvValue = getType(obsValue);
+			value.setCv(cvValue);
+		}
+		return value;
+	}
+	
+	private boolean isNumeric(String string) {
+		try {
+			Double.parseDouble(string);
+		} catch (NumberFormatException e) {
+			return false;
+		}
+		
+		return true;
 	}
 }
