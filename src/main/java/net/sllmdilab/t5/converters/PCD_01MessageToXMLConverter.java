@@ -629,8 +629,13 @@ public class PCD_01MessageToXMLConverter {
 	}
 
 	private String convertDtmToXmlDate(DTM observationDateTime) throws DataTypeException {
+		logger.info("Observation date: " + observationDateTime.getValue());
+		
 		Calendar dateOrderCalendar = observationDateTime.getValueAsCalendar();
 		dateOrderCalendar.setTimeZone(getTimeZone(observationDateTime));
+		
+		//TODO: This is a temporary fix to handle local time input
+		dateOrderCalendar.add(Calendar.HOUR_OF_DAY, -2);
 
 		return convertDateToXMLType(dateOrderCalendar.getTime());
 	}

@@ -103,6 +103,7 @@ public class ApplicationConfiguration extends CamelConfiguration {
 	public HL7DataFormat hl7DataFormat() {
 		HL7DataFormat hl7DataFormat = new HL7DataFormat();
 		hl7DataFormat.setHapiContext(hapiContext());
+		hl7DataFormat.setValidate(false);
 		return hl7DataFormat;
 	}
 
