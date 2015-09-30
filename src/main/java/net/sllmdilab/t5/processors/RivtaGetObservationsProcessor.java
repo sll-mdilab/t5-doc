@@ -40,9 +40,7 @@ public class RivtaGetObservationsProcessor implements Processor {
 
 	@Override
 	public void process(Exchange exchange) throws Exception {
-		
 		GetObservationsType request = (GetObservationsType) exchange.getIn().getBody();
-		logger.info("Called.");
 
 		String patientId = request.getPatientId().getRoot();
 		String observationTypeCode = request.getObservationType().get(0).getCode();

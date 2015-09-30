@@ -148,7 +148,6 @@ public class ApplicationConfiguration extends CamelConfiguration {
 	public SoapJaxbDataFormat soapJaxbDataFormat() {
 		return new SoapJaxbDataFormat(
 				"se.riv.clinicalprocess.healthcond.basic.getobservationsresponder.v1", new ServiceInterfaceStrategy(se.riv.clinicalprocess.healthcond.basic.getobservations.v1.rivtabp21.GetObservationsResponderInterface.class, false));
-	//soap.setVersion("1.0");
 	}
 	
 }

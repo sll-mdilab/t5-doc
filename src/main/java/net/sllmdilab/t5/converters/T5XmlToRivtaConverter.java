@@ -17,13 +17,17 @@ public class T5XmlToRivtaConverter {
 	public ObservationType getObservation(Observation t5Obs) {
 		ObservationType rivtaObs = new ObservationType();
 		
-		String obsTypeCode = t5Obs.getObsIdentifier().get(0).getValue();
-		rivtaObs.setType(getType(obsTypeCode));
+		if(!t5Obs.getObsIdentifier().isEmpty()) {
+			String obsTypeCode = t5Obs.getObsIdentifier().get(0).getValue();
+			rivtaObs.setType(getType(obsTypeCode));
+		}
 		
-		String obsValue = t5Obs.getValue().get(0).getValue();
-		String obsUnit = t5Obs.getUnit().getValue();
-		
-		rivtaObs.setValue(getValue(obsValue, obsUnit));
+		if(!t5Obs.getValue().isEmpty()) {
+			String obsValue = t5Obs.getValue().get(0).getValue();
+			String obsUnit = t5Obs.getUnit().getValue();
+			
+			rivtaObs.setValue(getValue(obsValue, obsUnit));
+		}
 		
 		String obsTimestamp = t5Obs.getTimestamp().getValue().toXMLFormat();
 		rivtaObs.setRegistrationTime(obsTimestamp);
