@@ -59,7 +59,7 @@ public class PCD01MessageDaoTest {
 		List<Observation> observations = messageDao.findByPatientIdTimeAndCode(MOCK_PATIENT_ID, start, end,
 				MOCK_OBS_TYPE_CODE);
 		assertEquals(2, observations.size());
-		assertEquals(observations.get(0).getObsIdentifier().get(0).getValue(), MOCK_OBS_TYPE_CODE);
-		assertEquals(observations.get(0).getUnit().getValue(), MOCK_UNIT_CODE);
+		assertEquals(MOCK_OBS_TYPE_CODE, observations.get(0).getObsIdentifier().get(0).getValue());
+		assertEquals(MOCK_UNIT_CODE, observations.get(0).getUnit().getValue());
 	}
 }

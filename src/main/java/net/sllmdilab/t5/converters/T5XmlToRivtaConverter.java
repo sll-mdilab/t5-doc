@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 import net.sll_mdilab.t5.Observation;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.stereotype.Component;
 
 import se.riv.clinicalprocess.healthcond.basic.v1.CVType;
@@ -43,7 +44,7 @@ public class T5XmlToRivtaConverter {
 
 	private ValueANYType getValue(String obsValue, String obsUnit) {
 		ValueANYType value = new ValueANYType();
-		if(isNumeric(obsValue)) {
+		if(NumberUtils.isNumber(obsValue)) {
 			PQType pqValue = new PQType();
 			pqValue.setValue(new BigDecimal(obsValue));
 			pqValue.setUnit(obsUnit);
@@ -53,15 +54,5 @@ public class T5XmlToRivtaConverter {
 			value.setCv(cvValue);
 		}
 		return value;
-	}
-	
-	private boolean isNumeric(String string) {
-		try {
-			Double.parseDouble(string);
-		} catch (NumberFormatException e) {
-			return false;
-		}
-		
-		return true;
 	}
 }

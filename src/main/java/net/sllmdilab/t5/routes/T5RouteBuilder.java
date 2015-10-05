@@ -159,12 +159,13 @@ public class T5RouteBuilder extends RouteBuilder {
 			.log(LoggingLevel.INFO, "Unable to deliver HL7v2 message.")
 			.to("log:hl7DeadLetter?level=INFO");
 		
+		// RIV-TA producer for observation data
 		from("jetty:http://0.0.0.0:8686/clinicalprocess/healthcond/basic/GetObservations/1/rivtabp21?enableJmx=true")
 				.onException(Exception.class)
 				    .handled(true)
 				    .marshal(rivtaObservationsDataFormat)
 				    .end()
-				.log(LoggingLevel.INFO, "Got SOAP request.")
+				.log(LoggingLevel.INFO, "Got GetObserations SOAP request.")
 				.unmarshal(rivtaObservationsDataFormat)
 				.processRef("rivtaGetObservationsProcessor")
 				.marshal(rivtaObservationsDataFormat);

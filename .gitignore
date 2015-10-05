@@ -18,6 +18,8 @@ id_file
 *.ear
 *.class
 
+!lib/clinicalprocess-healthcond-basic-schemas-1.jar
+
 !gradle/wrapper/**
 
 # eclipse specific git ignore
