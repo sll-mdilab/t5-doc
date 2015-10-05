@@ -23,7 +23,6 @@ jar {
     manifest {
         attributes 'Implementation-Title': 'T5 PoC', 'Implementation-Version': version, 'Main-Class': 'net.sllmdilab.t5.T5BackendApplication'
     }
-    //from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
 }
 
 task fatJar(type: Jar) {
@@ -52,23 +51,28 @@ repositories {
     }
 }
 
-
 sourceSets {
 	integrationTest {
 	 	java.srcDir file('src/integrationtest/java')
-	    resources.srcDir file('src/integrationtest/resources')
-	    
-	    compileClasspath += sourceSets.main.runtimeClasspath
+	  resources.srcDir file('src/integrationtest/resources')
+	  compileClasspath += sourceSets.main.runtimeClasspath
 	}
+	
+  generated {
+    java {
+      srcDir 'src/generated/java'
+    }
+  }
+  
+  main {
+    compileClasspath += sourceSets.generated.runtimeClasspath
+  }
 }
-
 
 task integrationTest(type: Test) {
     testClassesDir = sourceSets.integrationTest.output.classesDir
     classpath = sourceSets.integrationTest.runtimeClasspath
 }
-
-//check.dependsOn integrationTest
 
 dependencies {
 	compile 'org.slf4j:slf4j-api:1.7.10'
@@ -83,10 +87,13 @@ dependencies {
     compile 'org.apache.camel:camel-spring-javaconfig:' + camelVersion
     compile 'org.apache.camel:camel-http4:' + camelVersion
     compile 'org.apache.camel:camel-netty4:' + camelVersion
+    compile 'org.apache.camel:camel-soap:' + camelVersion
+    compile 'org.apache.camel:camel-jetty:' + camelVersion
     
     compile 'ca.uhn.hapi:hapi-structures-v26:2.2'
     compile 'ca.uhn.hapi:hapi-structures-v23:2.2'
     compile 'ca.uhn.hapi:hapi-structures-v251:2.2'
+    compile 'ca.uhn.hapi.fhir:hapi-fhir-base:0.9'
     compile 'com.marklogic:client-api-java:2.0-1'
     compile 'com.marklogic:marklogic-xcc:7.0.4'
     compile 'org.apache.jena:jena-core:2.13.0'
@@ -97,6 +104,7 @@ dependencies {
     compile name: 't5-commons-1.0'
     compile name: 'virt_jena2'
     compile name: 'virtjdbc4'
+    compile name: 'clinicalprocess-healthcond-basic-schemas-1'
     
     testCompile 'junit:junit:4.+'
     testCompile 'org.apache.camel:camel-test-spring:' + camelVersion

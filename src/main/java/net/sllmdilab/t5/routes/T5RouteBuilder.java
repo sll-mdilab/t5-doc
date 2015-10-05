@@ -8,7 +8,9 @@ import net.sllmdilab.t5.processors.WaveformScannerProcessor;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.hl7.HL7DataFormat;
+import org.apache.camel.dataformat.soap.SoapJaxbDataFormat;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -21,33 +23,37 @@ public class T5RouteBuilder extends RouteBuilder {
 
 	@Value("${T5_DATABASE_USER}")
 	private String databaseUser;
-	
+
 	@Value("${T5_DATABASE_PASSWORD}")
 	private String databasePassword;
-	
+
 	@Value("${T5_DATABASE_HOST}")
 	private String databaseHost;
-	
+
 	@Value("${T5_DATABASE_PORT}")
 	private String databasePort;
-	
+
 	@Value("${T5_RDF_USER}")
 	private String rdfUser;
-	
+
 	@Value("${T5_RDF_PASSWORD}")
 	private String rdfPassword;
-	
+
 	@Value("${T5_RDF_HOST}")
 	private String rdfHost;
-	
+
 	@Value("${T5_RDF_PORT}")
 	private String rdfPort;
-	
+
 	@Value("${T5_RDF_GRAPH}")
 	private String rdfGraph;
-	
+
 	@Autowired
 	private HL7DataFormat hl7DataFormat;
+	
+	@Autowired
+	@Qualifier("rivtaObservationsDataFormat")
+	private SoapJaxbDataFormat rivtaObservationsDataFormat;
 
 	@Override
 	public void configure() throws Exception {
@@ -152,6 +158,18 @@ public class T5RouteBuilder extends RouteBuilder {
 			.routeId("hl7DeadLetterRoute")
 			.log(LoggingLevel.INFO, "Unable to deliver HL7v2 message.")
 			.to("log:hl7DeadLetter?level=INFO");
+		
+		// RIV-TA producer for observation data
+		from("jetty:http://0.0.0.0:8686/clinicalprocess/healthcond/basic/GetObservations/1/rivtabp21?enableJmx=true")
+				.onException(Exception.class)
+				    .handled(true)
+				    .marshal(rivtaObservationsDataFormat)
+				    .end()
+				.log(LoggingLevel.INFO, "Got GetObserations SOAP request.")
+				.unmarshal(rivtaObservationsDataFormat)
+				.processRef("rivtaGetObservationsProcessor")
+				.marshal(rivtaObservationsDataFormat);
 		//@formatter:on
+		
 	}
 }

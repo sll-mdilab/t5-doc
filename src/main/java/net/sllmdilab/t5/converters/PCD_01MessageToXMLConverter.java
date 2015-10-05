@@ -20,7 +20,7 @@ import javax.xml.xpath.XPathFactory;
 import net.sllmdilab.commons.exceptions.RosettaLookupException;
 import net.sllmdilab.commons.t5.validators.RosettaValidator;
 import net.sllmdilab.commons.util.Constants;
-import net.sllmdilab.t5.exceptions.T5XMLConversionException;
+import net.sllmdilab.t5.exceptions.T5ConversionException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -84,7 +84,7 @@ public class PCD_01MessageToXMLConverter {
 			return doc;
 
 		} catch (HL7Exception | DOMException | ParserConfigurationException e) {
-			throw new T5XMLConversionException(e);
+			throw new T5ConversionException(e);
 		}
 	}
 
@@ -165,7 +165,7 @@ public class PCD_01MessageToXMLConverter {
 	}
 
 	private void handleOrderObservations(ORU_R01_ORDER_OBSERVATION orderObservation, Element elemPR, Document doc)
-			throws T5XMLConversionException {
+			throws T5ConversionException {
 		try {
 			Map<String, Element> mapMDS = new HashMap<String, Element>();
 			Map<String, Element> mapVMD = new HashMap<String, Element>();
@@ -214,7 +214,7 @@ public class PCD_01MessageToXMLConverter {
 			}
 
 		} catch (HL7Exception | DOMException | XPathExpressionException e) {
-			throw new T5XMLConversionException(e);
+			throw new T5ConversionException(e);
 		}
 	}
 
