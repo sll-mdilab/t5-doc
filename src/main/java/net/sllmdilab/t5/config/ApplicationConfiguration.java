@@ -8,6 +8,7 @@ import net.sllmdilab.commons.exceptions.RosettaInitializationException;
 import net.sllmdilab.commons.t5.validators.RosettaValidator;
 import net.sllmdilab.t5.converters.PCD_01MessageToXMLConverter;
 import net.sllmdilab.t5.converters.XMLToRDFConverter;
+import net.sllmdilab.t5.processors.TimeAdjustmentProcessor;
 
 import org.apache.camel.component.hl7.HL7DataFormat;
 import org.apache.camel.component.hl7.HL7MLLPNettyDecoderFactory;
@@ -60,6 +61,12 @@ public class ApplicationConfiguration extends CamelConfiguration {
 	@Value("${T5_DATABASE_XCC_NAME}")
 	private String databaseXccName;
 
+	@Value("${T5_TIME_ADJUSTMENT_ENABLED}")
+	private boolean timeAdjustmentEnabled;
+	
+	@Value("${T5_DEFAULT_TIME_ZONE}")
+	private String timeZoneId;
+	
 	@Bean
 	public static PropertyPlaceholderConfigurer propertyPlaceholderConfigurer() {
 		PropertyPlaceholderConfigurer placeholderConfigurer = new PropertyPlaceholderConfigurer();
@@ -142,4 +149,10 @@ public class ApplicationConfiguration extends CamelConfiguration {
 	public MLDBClient mldbClient() throws XccConfigException, URISyntaxException {
 		return new MLDBClient(contentSource());
 	}
+	
+	@Bean
+	public TimeAdjustmentProcessor timeAdjustmentProcessor() {
+		return new TimeAdjustmentProcessor(timeAdjustmentEnabled, timeZoneId);
+	}
+	
 }
