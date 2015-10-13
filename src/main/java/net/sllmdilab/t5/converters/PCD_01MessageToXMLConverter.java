@@ -1,4 +1,4 @@
-ƒpackage net.sllmdilab.t5.converters;
+package net.sllmdilab.t5.converters;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
