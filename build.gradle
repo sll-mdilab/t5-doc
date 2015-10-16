@@ -1,9 +1,10 @@
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'application'
+apply plugin: 'osgi'
 
 sourceCompatibility = 1.8
-version = '0.1'
+version = '0.4.5'
 
 def camelVersion = "2.15.2"
 
@@ -21,7 +22,9 @@ configurations.all {
 
 jar {
     manifest {
-        attributes 'Implementation-Title': 'T5 PoC', 'Implementation-Version': version, 'Main-Class': 'net.sllmdilab.t5.T5BackendApplication'
+        attributes 'Implementation-Title': 'T5 PoC', 'Implementation-Version': version
+        //instruction 'Bundle-Activator', 'net.sllmdilab.t5.Activator'
+        
     }
     //from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
 }
@@ -36,7 +39,7 @@ task fatJar(type: Jar) {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.2.1'
+    gradleVersion = '2.7'
 }
 
 repositories {
@@ -83,6 +86,7 @@ dependencies {
     compile 'org.apache.camel:camel-spring-javaconfig:' + camelVersion
     compile 'org.apache.camel:camel-http4:' + camelVersion
     compile 'org.apache.camel:camel-netty4:' + camelVersion
+    compile 'org.apache.camel:camel-core-osgi:' + camelVersion
     
     compile 'ca.uhn.hapi:hapi-structures-v26:2.2'
     compile 'ca.uhn.hapi:hapi-structures-v23:2.2'
@@ -93,6 +97,7 @@ dependencies {
     compile 'org.apache.jena:jena-arq:2.13.0'
     compile 'net.sf.opencsv:opencsv:2.3'
     compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.6.1'
+    compile 'org.apache.felix:org.apache.felix.framework:4.2.1'
     
     compile name: 't5-commons-1.0'
     compile name: 'virt_jena2'

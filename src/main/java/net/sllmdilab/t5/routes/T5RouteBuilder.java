@@ -10,12 +10,11 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.hl7.HL7DataFormat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
 import ca.uhn.hl7v2.AcknowledgmentCode;
 import ca.uhn.hl7v2.HL7Exception;
 
-@Component
+//@Component
 public class T5RouteBuilder extends RouteBuilder {
 	public static final String DATABASE_GRAPH_NAME = "http://sll-mdilab.net/T5#graph";
 

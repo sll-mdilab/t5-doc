@@ -8,11 +8,11 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ComponentScan
-public class T5BackendApplication {
+public class T5BackendApplication{
+	private static Logger logger = LoggerFactory.getLogger(T5BackendApplication.class);
 	
 	@SuppressWarnings("resource")
 	public static void main(String[] args) {
-		Logger logger = LoggerFactory.getLogger(T5BackendApplication.class);
 		logger.info("Starting application.");
 		
 		new AnnotationConfigApplicationContext(

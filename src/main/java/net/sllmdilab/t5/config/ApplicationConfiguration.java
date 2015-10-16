@@ -6,13 +6,18 @@ import java.net.URISyntaxException;
 import net.sllmdilab.commons.database.MLDBClient;
 import net.sllmdilab.commons.exceptions.RosettaInitializationException;
 import net.sllmdilab.commons.t5.validators.RosettaValidator;
+import net.sllmdilab.t5.Activator;
 import net.sllmdilab.t5.converters.PCD_01MessageToXMLConverter;
 import net.sllmdilab.t5.converters.XMLToRDFConverter;
 
+import org.apache.camel.CamelContext;
 import org.apache.camel.component.hl7.HL7DataFormat;
 import org.apache.camel.component.hl7.HL7MLLPNettyDecoderFactory;
 import org.apache.camel.component.hl7.HL7MLLPNettyEncoderFactory;
+import org.apache.camel.osgi.OsgiSpringCamelContext;
+import org.apache.camel.spring.SpringCamelContext;
 import org.apache.camel.spring.javaconfig.CamelConfiguration;
+import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,8 +44,20 @@ import com.marklogic.xcc.exceptions.XccConfigException;
 
 @Configuration
 @ComponentScan({ "net.sllmdilab.t5.*" })
+//public class ApplicationConfiguration extends CamelConfiguration {
 public class ApplicationConfiguration extends CamelConfiguration {
 	private static Logger logger = LoggerFactory.getLogger(ApplicationConfiguration.class);
+	
+	private BundleContext bundleContext;
+	
+//	@Override
+//	protected CamelContext createCamelContext() throws Exception {
+//		if(bundleContext == null) {
+//			return new SpringCamelContext(getApplicationContext());
+//		} else {
+//			return new OsgiSpringCamelContext(getApplicationContext(), bundleContext);
+//		}
+//	}
 
 	@Value("${T5_DATABASE_HOST}")
 	private String databaseHost;
@@ -141,5 +158,15 @@ public class ApplicationConfiguration extends CamelConfiguration {
 	@Bean
 	public MLDBClient mldbClient() throws XccConfigException, URISyntaxException {
 		return new MLDBClient(contentSource());
+	}
+
+//	@Override
+//	public void setBundleContext(BundleContext bundleContext) {
+//		this.bundleContext = bundleContext;
+//	}
+	
+	@Bean(initMethod="start", destroyMethod="stop")
+	public Activator activator() {
+		return new Activator();
 	}
 }
