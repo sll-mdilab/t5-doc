@@ -7,6 +7,7 @@ import java.util.Date;
 
 import net.sllmdilab.commons.util.Constants;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +35,9 @@ public class VirtuosoJenaRDFLoader {
 		this.pw = pw;
 		this.url = "jdbc:virtuoso://" + host + ":" + port + "/charset=UTF-8/log_enable=2";
 		
-		connect();
+		if(!StringUtils.isBlank(host)) {
+			connect();
+		}
 	}
 	
 	private void connect() {
