@@ -17,13 +17,12 @@ import virtuoso.jena.driver.VirtuosoUpdateFactory;
 import virtuoso.jena.driver.VirtuosoUpdateRequest;
 
 public class VirtuosoJenaRDFLoader {
-
-	private static final int QUERY_TIMEOUT = 1;
-
-	private static Logger logger = LoggerFactory.getLogger(VirtuosoJenaRDFLoader.class);
-
+	
 	// Insert batches of max 1000 triples/lines
 	private static final int BATCH_SIZE = 1000;
+	private static final int QUERY_TIMEOUT_SECONDS = 2;
+
+	private static Logger logger = LoggerFactory.getLogger(VirtuosoJenaRDFLoader.class);
 	
 	private String username;
 	private String pw;
@@ -33,15 +32,14 @@ public class VirtuosoJenaRDFLoader {
 	public VirtuosoJenaRDFLoader(String host, int port, String username, String pw) {
 		this.username = username;
 		this.pw = pw;
-		String jdbcConn = host + ":" + port;
-		this.url = "jdbc:virtuoso://" + jdbcConn + "/charset=UTF-8/log_enable=2";
+		this.url = "jdbc:virtuoso://" + host + ":" + port + "/charset=UTF-8/log_enable=2";
 		
 		connect();
 	}
 	
 	private void connect() {
 		virtGraph = new VirtGraph(null, url, username, pw, true);
-		virtGraph.setQueryTimeout(QUERY_TIMEOUT);
+		virtGraph.setQueryTimeout(QUERY_TIMEOUT_SECONDS);
 		
 		logger.info("Virtuoso connected to " + url);
 	}
