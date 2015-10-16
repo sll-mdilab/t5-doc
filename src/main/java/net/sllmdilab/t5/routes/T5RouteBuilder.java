@@ -21,6 +21,9 @@ import ca.uhn.hl7v2.HL7Exception;
 public class T5RouteBuilder extends RouteBuilder {
 	public static final String DATABASE_GRAPH_NAME = "http://sll-mdilab.net/T5#graph";
 
+	@Value("${T5_PORT}")
+	private String hl7Port;
+	
 	@Value("${T5_DATABASE_USER}")
 	private String databaseUser;
 
@@ -60,7 +63,7 @@ public class T5RouteBuilder extends RouteBuilder {
 		//@formatter:off
 
 		// Main route, consumes HL7 messages through MLLP 
-		from("netty4:tcp://0.0.0.0:8870?sync=true&encoder=#hl7encoder&decoder=#hl7decoder")
+		from("netty4:tcp://0.0.0.0:" + hl7Port + "?sync=true&encoder=#hl7encoder&decoder=#hl7decoder")
 			.routeId("mainRoute")
 			.log(LoggingLevel.INFO, "Processing new message.")
 			.onException(HL7Exception.class)

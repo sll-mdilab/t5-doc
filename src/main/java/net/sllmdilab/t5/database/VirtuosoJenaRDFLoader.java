@@ -10,30 +10,41 @@ import net.sllmdilab.commons.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.hp.hpl.jena.update.UpdateException;
+
 import virtuoso.jena.driver.VirtGraph;
 import virtuoso.jena.driver.VirtuosoUpdateFactory;
 import virtuoso.jena.driver.VirtuosoUpdateRequest;
 
 public class VirtuosoJenaRDFLoader {
-
-	private static Logger logger = LoggerFactory.getLogger(VirtuosoJenaRDFLoader.class);
-
+	
 	// Insert batches of max 1000 triples/lines
 	private static final int BATCH_SIZE = 1000;
+	private static final int QUERY_TIMEOUT_SECONDS = 2;
 
+	private static Logger logger = LoggerFactory.getLogger(VirtuosoJenaRDFLoader.class);
+	
+	private String username;
+	private String pw;
+	private String url;
 	private VirtGraph virtGraph;
 
 	public VirtuosoJenaRDFLoader(String host, int port, String username, String pw) {
-
-		String jdbcConn = host + ":" + port;
-
-		String url = "jdbc:virtuoso://" + jdbcConn + "/charset=UTF-8/log_enable=2";
+		this.username = username;
+		this.pw = pw;
+		this.url = "jdbc:virtuoso://" + host + ":" + port + "/charset=UTF-8/log_enable=2";
+		
+		connect();
+	}
+	
+	private void connect() {
 		virtGraph = new VirtGraph(null, url, username, pw, true);
-		logger.info("Virtuoso connected:" + jdbcConn);
+		virtGraph.setQueryTimeout(QUERY_TIMEOUT_SECONDS);
+		
+		logger.info("Virtuoso connected to " + url);
 	}
 
 	public void close() {
-
 		if (virtGraph != null) {
 			virtGraph.close();
 		}
@@ -62,19 +73,31 @@ public class VirtuosoJenaRDFLoader {
 			buf.append("\n");
 
 			if ((i % BATCH_SIZE == 0 && i > 0) || (i + 1) == lines.length) {
-				String queryStr = queryTemplate.replace("_TRIPLES_", buf.toString());
-				VirtuosoUpdateRequest vur = VirtuosoUpdateFactory.create(queryStr, virtGraph);
-
-				long startTime = System.currentTimeMillis();
-				vur.exec();
-				logger.info("Virtuoso request took " + (System.currentTimeMillis() - startTime) + " ms.");
-
+				String query = queryTemplate.replace("_TRIPLES_", buf.toString());
+				
+				try {
+					sendUpdateRequest(query, virtGraph);
+				} catch (UpdateException e) {
+					// Retry once
+					logger.info("Virtuoso connection failed, reconnecting...");
+					connect();
+					
+					sendUpdateRequest(query, virtGraph);
+				}
+				
 				// Re-init buffer
 				buf = new StringBuilder();
 			}
 		}
 
 		logger.info("loaded in:" + (System.currentTimeMillis() - start) + " msec");
+	}
+	
+	private void sendUpdateRequest(String query, VirtGraph virtGraph) {
+		long startTime = System.currentTimeMillis();
+		VirtuosoUpdateRequest vur = VirtuosoUpdateFactory.create(query, virtGraph);
+		vur.exec();
+		logger.info("Virtuoso request took " + (System.currentTimeMillis() - startTime) + " ms.");
 	}
 
 	private String convertDateToXMLTypeWithZ(Date date) {

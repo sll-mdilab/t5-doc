@@ -633,9 +633,6 @@ public class PCD_01MessageToXMLConverter {
 		
 		Calendar dateOrderCalendar = observationDateTime.getValueAsCalendar();
 		dateOrderCalendar.setTimeZone(getTimeZone(observationDateTime));
-		
-		//TODO: This is a temporary fix to handle local time input
-		dateOrderCalendar.add(Calendar.HOUR_OF_DAY, -2);
 
 		return convertDateToXMLType(dateOrderCalendar.getTime());
 	}
