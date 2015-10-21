@@ -9,6 +9,7 @@ import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.hl7.HL7DataFormat;
 import org.apache.camel.dataformat.soap.SoapJaxbDataFormat;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import ca.uhn.hl7v2.AcknowledgmentCode;
 import ca.uhn.hl7v2.HL7Exception;
+import static org.apache.camel.builder.PredicateBuilder.*;
 
 @Component
 public class T5RouteBuilder extends RouteBuilder {
@@ -23,7 +25,7 @@ public class T5RouteBuilder extends RouteBuilder {
 
 	@Value("${T5_PORT}")
 	private String hl7Port;
-	
+
 	@Value("${T5_DATABASE_USER}")
 	private String databaseUser;
 
@@ -53,7 +55,7 @@ public class T5RouteBuilder extends RouteBuilder {
 
 	@Autowired
 	private HL7DataFormat hl7DataFormat;
-	
+
 	@Autowired
 	@Qualifier("rivtaObservationsDataFormat")
 	private SoapJaxbDataFormat rivtaObservationsDataFormat;
@@ -136,12 +138,16 @@ public class T5RouteBuilder extends RouteBuilder {
 		from("seda:triples?concurrentConsumers=4") 
 			.routeId("triplificationRoute")
 			// Ignore waveform messages
-			.filter(header(WaveformScannerProcessor.IS_WAVEFORM_HEADER).isNotEqualTo(true))
-			.log(LoggingLevel.INFO, "Converting to triples.")
-			.processRef("triplificationProcessor")
-			.log(LoggingLevel.INFO, "Saving triples to DB.")
-			.inOnly("virtuoso://" + rdfUser + ":" + rdfPassword + "@" + rdfHost +":" + rdfPort + "/" + rdfGraph)
-			.log(LoggingLevel.INFO, "Finished saving triples to DB.");
+			.filter(
+					and(
+						constant(StringUtils.isBlank(rdfHost)).isEqualTo(false), 
+						header(WaveformScannerProcessor.IS_WAVEFORM_HEADER).isNotEqualTo(true))
+					)
+				.log(LoggingLevel.INFO, "Converting to triples.")
+				.processRef("triplificationProcessor")
+				.log(LoggingLevel.INFO, "Saving triples to DB.")
+				.inOnly("virtuoso://" + rdfUser + ":" + rdfPassword + "@" + rdfHost +":" + rdfPort + "/" + rdfGraph)
+				.log(LoggingLevel.INFO, "Finished saving triples to DB.");
 		
 		// Pass message to defined recipients
 		from("seda:hl7Brokering")
@@ -173,6 +179,6 @@ public class T5RouteBuilder extends RouteBuilder {
 				.processRef("rivtaGetObservationsProcessor")
 				.marshal(rivtaObservationsDataFormat);
 		//@formatter:on
-		
+
 	}
 }

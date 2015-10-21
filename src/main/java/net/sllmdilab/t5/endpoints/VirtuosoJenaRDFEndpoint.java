@@ -9,6 +9,7 @@ import org.apache.camel.Consumer;
 import org.apache.camel.Processor;
 import org.apache.camel.Producer;
 import org.apache.camel.impl.DefaultEndpoint;
+import org.apache.commons.lang3.StringUtils;
 
 public class VirtuosoJenaRDFEndpoint extends DefaultEndpoint {
 
@@ -34,6 +35,10 @@ public class VirtuosoJenaRDFEndpoint extends DefaultEndpoint {
 	}
 
 	private String getUser(String userInfo) {
+		if(StringUtils.isBlank(userInfo)) {
+			return "";
+		}
+		
 		if (!userInfo.contains(":")) {
 			return userInfo;
 		}
@@ -41,6 +46,10 @@ public class VirtuosoJenaRDFEndpoint extends DefaultEndpoint {
 	}
 
 	private String getPassword(String userInfo) {
+		if(StringUtils.isBlank(userInfo)) {
+			return "";
+		}
+		
 		if (!userInfo.contains(":") || userInfo.indexOf(":") == userInfo.length() - 1) {
 			return "";
 		}
@@ -50,6 +59,10 @@ public class VirtuosoJenaRDFEndpoint extends DefaultEndpoint {
 	}
 
 	private String stripInitialSlash(String path) {
+		if(StringUtils.isBlank(path)) {
+			return "";
+		}
+		
 		if (path.startsWith("/")) {
 			return path.substring(1);
 		} else {
