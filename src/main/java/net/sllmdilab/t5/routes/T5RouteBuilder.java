@@ -138,8 +138,11 @@ public class T5RouteBuilder extends RouteBuilder {
 		from("seda:triples?concurrentConsumers=4") 
 			.routeId("triplificationRoute")
 			// Ignore waveform messages
-			.filter(and(constant(StringUtils.isBlank(rdfHost)).isNotEqualTo(true), 
-					header(WaveformScannerProcessor.IS_WAVEFORM_HEADER).isNotEqualTo(true)))
+			.filter(
+					and(
+						constant(StringUtils.isBlank(rdfHost)).isEqualTo(false), 
+						header(WaveformScannerProcessor.IS_WAVEFORM_HEADER).isNotEqualTo(true))
+					)
 				.log(LoggingLevel.INFO, "Converting to triples.")
 				.processRef("triplificationProcessor")
 				.log(LoggingLevel.INFO, "Saving triples to DB.")
