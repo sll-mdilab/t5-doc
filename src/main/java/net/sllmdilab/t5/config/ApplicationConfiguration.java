@@ -40,7 +40,6 @@ import com.marklogic.xcc.ContentSourceFactory;
 import com.marklogic.xcc.exceptions.XccConfigException;
 
 @Configuration
-@ComponentScan({ "net.sllmdilab.t5.*" })
 public class ApplicationConfiguration extends CamelConfiguration {
 	private static Logger logger = LoggerFactory.getLogger(ApplicationConfiguration.class);
 
