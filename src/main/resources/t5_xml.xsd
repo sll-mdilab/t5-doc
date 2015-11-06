@@ -384,6 +384,12 @@ http://ihe.net/Technical_Framework/upload/IHE_PCD_Suppl_WCM.pdf</xs:documentatio
                     <xs:documentation>PID-5</xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:element minOccurs="0" ref="t5:Location">
+                <xs:annotation>
+                    <xs:documentation>PV1-3
+</xs:documentation>
+                </xs:annotation>
+            </xs:element>
         </xs:sequence>
     </xs:complexType>
     <xs:complexType name="Patient_Result">
@@ -481,5 +487,18 @@ MSH-3.1 is used as Application ID, which is an identifier of the System
         <xs:simpleContent>
             <xs:extension base="xs:dateTime"/>
         </xs:simpleContent>
+    </xs:complexType>
+    <xs:element name="Location" type="t5:Location"/>
+    <xs:complexType name="Location">
+        <xs:attribute name="room">
+            <xs:annotation>
+                <xs:documentation>PV1-3.2</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="bed" use="optional">
+            <xs:annotation>
+                <xs:documentation>PV1-3.3</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
     </xs:complexType>
 </xs:schema>
