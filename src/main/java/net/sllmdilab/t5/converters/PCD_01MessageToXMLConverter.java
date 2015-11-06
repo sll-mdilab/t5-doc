@@ -40,14 +40,18 @@ import ca.uhn.hl7v2.model.v26.datatype.CWE;
 import ca.uhn.hl7v2.model.v26.datatype.CX;
 import ca.uhn.hl7v2.model.v26.datatype.DTM;
 import ca.uhn.hl7v2.model.v26.datatype.EI;
+import ca.uhn.hl7v2.model.v26.datatype.IS;
+import ca.uhn.hl7v2.model.v26.datatype.PL;
 import ca.uhn.hl7v2.model.v26.group.ORU_R01_OBSERVATION;
 import ca.uhn.hl7v2.model.v26.group.ORU_R01_ORDER_OBSERVATION;
 import ca.uhn.hl7v2.model.v26.group.ORU_R01_PATIENT;
 import ca.uhn.hl7v2.model.v26.group.ORU_R01_PATIENT_RESULT;
+import ca.uhn.hl7v2.model.v26.group.ORU_R01_VISIT;
 import ca.uhn.hl7v2.model.v26.message.ORU_R01;
 import ca.uhn.hl7v2.model.v26.segment.MSH;
 import ca.uhn.hl7v2.model.v26.segment.OBX;
 import ca.uhn.hl7v2.model.v26.segment.PID;
+import ca.uhn.hl7v2.model.v26.segment.PV1;
 
 public class PCD_01MessageToXMLConverter {
 
@@ -162,6 +166,22 @@ public class PCD_01MessageToXMLConverter {
 			elemID.setAttribute("authority", plist.getAssigningAuthority().getNamespaceID().getValueOrEmpty());
 			elemID.setAttribute("typeCode", plist.getIdentifierTypeCode().getValueOrEmpty());
 		}
+		
+		// handle visit
+		ORU_R01_VISIT visit = patient.getVISIT();
+		PL location = visit.getPV1().getAssignedPatientLocation();
+		IS room = location.getRoom();
+		IS bed = location.getBed();
+		String bedID = bed.getValueOrEmpty();
+		String roomID = room.getValueOrEmpty();	
+		// if there is either ned or room given, create an object
+		if( !bedID.equals("") || !roomID.equals("")){
+			Element elemLocation = doc.createElement("Location");
+			elemPatient.appendChild(elemLocation);
+			elemLocation.setAttribute("room", roomID);
+			elemLocation.setAttribute("bed", bedID);
+		}
+		
 	}
 
 	private void handleOrderObservations(ORU_R01_ORDER_OBSERVATION orderObservation, Element elemPR, Document doc)
