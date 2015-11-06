@@ -170,15 +170,17 @@ public class PCD_01MessageToXMLConverter {
 		// handle visit
 		ORU_R01_VISIT visit = patient.getVISIT();
 		PL location = visit.getPV1().getAssignedPatientLocation();
+		IS pointOfCare = location.getPointOfCare();
 		IS room = location.getRoom();
 		IS bed = location.getBed();
+		String pointOfCareID = pointOfCare.getValueOrEmpty();
 		String bedID = bed.getValueOrEmpty();
 		String roomID = room.getValueOrEmpty();	
-		// if there is either ned or room given, create an object
-		if( !bedID.equals("") || !roomID.equals("")){
+		// if there is either bed or room given, create an object
+		if( !pointOfCareID.equals("") || !bedID.equals("") || !roomID.equals("")){
 			Element elemLocation = doc.createElement("Location");
 			elemPatient.appendChild(elemLocation);
-			elemLocation.setAttribute("room", roomID);
+			elemLocation.setAttribute("pointOfCare", pointOfCareID);
 			elemLocation.setAttribute("bed", bedID);
 		}
 		

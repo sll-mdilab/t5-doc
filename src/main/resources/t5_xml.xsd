@@ -490,14 +490,19 @@ MSH-3.1 is used as Application ID, which is an identifier of the System
     </xs:complexType>
     <xs:element name="Location" type="t5:Location"/>
     <xs:complexType name="Location">
-        <xs:attribute name="room">
+        <xs:attribute name="room" type="xs:string">
             <xs:annotation>
                 <xs:documentation>PV1-3.2</xs:documentation>
             </xs:annotation>
         </xs:attribute>
-        <xs:attribute name="bed" use="optional">
+        <xs:attribute name="bed" use="optional" type="xs:string">
             <xs:annotation>
                 <xs:documentation>PV1-3.3</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="pointOfCare" type="xs:string" use="optional">
+            <xs:annotation>
+                <xs:documentation>PV1-3.1</xs:documentation>
             </xs:annotation>
         </xs:attribute>
     </xs:complexType>
