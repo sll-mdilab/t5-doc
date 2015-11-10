@@ -1,11 +1,25 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.2.2.RELEASE")
+    }
+}
+
 apply plugin: 'java'
-apply plugin: 'eclipse'
-apply plugin: 'application'
+apply plugin: 'eclipse-wtp'
+apply plugin: 'spring-boot'
+apply plugin: 'war'
+
+springBoot {
+  mainClass = 'net.sllmdilab.t5.T5FatJarRouter'
+}
 
 sourceCompatibility = 1.8
-version = '0.1'
+version = '0.5'
 
-def camelVersion = "2.15.2"
+def camelVersion = "2.16.0"
 
 configurations.all {
     resolutionStrategy.eachDependency {
@@ -19,23 +33,12 @@ configurations.all {
     exclude module: 'slf4j-log4j12'
 }
 
-jar {
-    manifest {
-        attributes 'Implementation-Title': 'T5 PoC', 'Implementation-Version': version, 'Main-Class': 'net.sllmdilab.t5.T5BackendApplication'
-    }
-}
-
-task fatJar(type: Jar) {
-	manifest {
-        attributes 'Implementation-Title': 'T5 PoC', 'Implementation-Version': version, 'Main-Class': 'net.sllmdilab.t5.T5BackendApplication'
-    }
-    baseName = project.name + '-all'
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-    with jar
+configurations {
+    providedRuntime
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.2.1'
+    gradleVersion = '2.8'
 }
 
 repositories {
@@ -63,10 +66,29 @@ sourceSets {
       srcDir 'src/generated/java'
     }
   }
-  
+ 
   main {
     compileClasspath += sourceSets.generated.runtimeClasspath
   }
+  
+  test {
+    compileClasspath += sourceSets.generated.runtimeClasspath
+    runtimeClasspath += sourceSets.generated.runtimeClasspath
+  }
+}
+
+jar {
+  manifest {
+   attributes 'Implementation-Title': 'T5 PoC', 'Implementation-Version': version, 'Main-Class': 'net.sllmdilab.t5.T5FatJarRouter'
+  }
+}
+
+war {
+  manifest {
+    attributes 'Implementation-Title': 'T5 PoC', 'Implementation-Version': version, 'Main-Class': 'net.sllmdilab.t5.T5FatJarRouter'
+  }
+  
+  classpath sourceSets.generated.output
 }
 
 task integrationTest(type: Test) {
@@ -75,20 +97,25 @@ task integrationTest(type: Test) {
 }
 
 dependencies {
-	compile 'org.slf4j:slf4j-api:1.7.10'
-    compile 'ch.qos.logback:logback-classic:1.1.2'
-    compile 'ch.qos.logback:logback-core:1.1.2'
+    compile ('org.springframework.boot:spring-boot-starter-web:1.2.2.RELEASE') {
+        exclude module: "spring-boot-starter-tomcat"
+    }
+    
+    providedRuntime("org.springframework.boot:spring-boot-starter-tomcat")
+
+    compile 'org.springframework.boot:spring-boot-starter-logging:1.2.2.RELEASE'
+  	compile 'org.slf4j:slf4j-api:1.7.10'
     compile 'org.slf4j:jcl-over-slf4j:1.7.10'
     compile 'org.slf4j:log4j-over-slf4j:1.7.10'
     
     compile 'commons-collections:commons-collections:3.2'
     compile 'org.apache.camel:camel-core:' + camelVersion
     compile 'org.apache.camel:camel-hl7:' + camelVersion
+    compile 'org.apache.camel:camel-spring-boot:' + camelVersion
     compile 'org.apache.camel:camel-spring-javaconfig:' + camelVersion
     compile 'org.apache.camel:camel-http4:' + camelVersion
     compile 'org.apache.camel:camel-netty4:' + camelVersion
     compile 'org.apache.camel:camel-soap:' + camelVersion
-    compile 'org.apache.camel:camel-jetty:' + camelVersion
     
     compile 'ca.uhn.hapi:hapi-structures-v26:2.2'
     compile 'ca.uhn.hapi:hapi-structures-v23:2.2'

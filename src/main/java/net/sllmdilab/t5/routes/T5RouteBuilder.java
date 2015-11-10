@@ -84,21 +84,21 @@ public class T5RouteBuilder extends RouteBuilder {
 				.end()
 			.unmarshal(hl7DataFormat)
 			.log(LoggingLevel.INFO, "Performing data injection.")
-			.processRef("dataInjectionProcessor")			
+			.process("dataInjectionProcessor")			
 			.log(LoggingLevel.INFO, "Extracting device IDs.")
-			.processRef("deviceIdScannerProcessor")
+			.process("deviceIdScannerProcessor")
 			.inOnly("seda:hl7Brokering")
 			.log(LoggingLevel.INFO, "Scanning for waveform message.")
-			.processRef("waveformScannerProcessor")
+			.process("waveformScannerProcessor")
 			.log(LoggingLevel.INFO, "Performing validation.")
-			.processRef("profileValidationProcessor")
+			.process("profileValidationProcessor")
 			.choice()
 				.when(header(ProfileValidationProcessor.VALIDATION_ERRORS_HEADER).isNotNull())
 				    .log(LoggingLevel.INFO, "Message contained validation errors.")
 				    .inOnly("seda:standardxml")
 					.inOnly("seda:t5xml")
 					.transform(ack(AcknowledgmentCode.AA))
-					.processRef("validationErrorAckProcessor")
+					.process("validationErrorAckProcessor")
 					.inOnly("seda:ack")
 					.endChoice()
 				.otherwise()
@@ -112,7 +112,7 @@ public class T5RouteBuilder extends RouteBuilder {
 		from("seda:standardxml") 
 			.routeId("standardXMLRoute")
 			.log(LoggingLevel.INFO, "Converting to HL7v2 Standard-XML.")
-			.processRef("standardHL7XMLProcessor")
+			.process("standardHL7XMLProcessor")
 			.log(LoggingLevel.INFO, "Saving Standard-XML to DB.")
 			.to("mldb:standardxml");
 		
@@ -120,7 +120,7 @@ public class T5RouteBuilder extends RouteBuilder {
 		from("seda:ack") 
 			.routeId("ackStandardXMLRoute")
 			.log(LoggingLevel.INFO, "Converting ACK to HL7v2 Standard-XML.")
-			.processRef("standardHL7XMLProcessor")
+			.process("standardHL7XMLProcessor")
 			.log(LoggingLevel.INFO, "Saving ACK Standard-XML to DB.")
 			.inOnly("seda:triples")
 			.inOnly("mldb:ack");
@@ -129,7 +129,7 @@ public class T5RouteBuilder extends RouteBuilder {
 		from("seda:t5xml") 
 			.routeId("t5XMLRoute")
 			.log(LoggingLevel.INFO, "Converting to T5-XML.")
-			.processRef("t5XMLProcessor")
+			.process("t5XMLProcessor")
 			.log(LoggingLevel.INFO, "T5-XML to DB.")
 			.inOnly("seda:triples")
 			.inOnly("mldb:t5xml");
@@ -144,7 +144,7 @@ public class T5RouteBuilder extends RouteBuilder {
 						header(WaveformScannerProcessor.IS_WAVEFORM_HEADER).isNotEqualTo(true))
 					)
 				.log(LoggingLevel.INFO, "Converting to triples.")
-				.processRef("triplificationProcessor")
+				.process("triplificationProcessor")
 				.log(LoggingLevel.INFO, "Saving triples to DB.")
 				.inOnly("virtuoso://" + rdfUser + ":" + rdfPassword + "@" + rdfHost +":" + rdfPort + "/" + rdfGraph)
 				.log(LoggingLevel.INFO, "Finished saving triples to DB.");
@@ -153,8 +153,8 @@ public class T5RouteBuilder extends RouteBuilder {
 		from("seda:hl7Brokering")
 			.routeId("hl7BrokeringRoute")
 			.log(LoggingLevel.INFO, "Performing brokering.")
-			.processRef("patientIdentificationProcessor")
-			.processRef("brokeringRecipientListProcessor")
+			.process("patientIdentificationProcessor")
+			.process("brokeringRecipientListProcessor")
 			.marshal(hl7DataFormat)
 			.errorHandler(deadLetterChannel("seda:hl7DeadLetter")
 				.retryAttemptedLogLevel(LoggingLevel.INFO))
@@ -169,15 +169,15 @@ public class T5RouteBuilder extends RouteBuilder {
 			.to("log:hl7DeadLetter?level=INFO");
 		
 		// RIV-TA producer for observation data
-		from("jetty:http://0.0.0.0:8686/clinicalprocess/healthcond/basic/GetObservations/1/rivtabp21?enableJmx=true")
-				.onException(Exception.class)
-				    .handled(true)
-				    .marshal(rivtaObservationsDataFormat)
-				    .end()
-				.log(LoggingLevel.INFO, "Got GetObserations SOAP request.")
-				.unmarshal(rivtaObservationsDataFormat)
-				.processRef("rivtaGetObservationsProcessor")
-				.marshal(rivtaObservationsDataFormat);
+//		from("jetty:http://0.0.0.0:8686/clinicalprocess/healthcond/basic/GetObservations/1/rivtabp21?enableJmx=true")
+//				.onException(Exception.class)
+//				    .handled(true)
+//				    .marshal(rivtaObservationsDataFormat)
+//				    .end()
+//				.log(LoggingLevel.INFO, "Got GetObserations SOAP request.")
+//				.unmarshal(rivtaObservationsDataFormat)
+//				.process("rivtaGetObservationsProcessor")
+//				.marshal(rivtaObservationsDataFormat);
 		//@formatter:on
 
 	}
