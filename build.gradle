@@ -3,7 +3,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.2.2.RELEASE")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.2.7.RELEASE")
     }
 }
 
@@ -97,13 +97,15 @@ task integrationTest(type: Test) {
 }
 
 dependencies {
-    compile ('org.springframework.boot:spring-boot-starter-web:1.2.2.RELEASE') {
+    compile ('org.springframework.boot:spring-boot-starter-web:1.2.7.RELEASE') {
         exclude module: "spring-boot-starter-tomcat"
     }
     
     providedRuntime("org.springframework.boot:spring-boot-starter-tomcat")
 
     compile 'org.springframework.boot:spring-boot-starter-logging:1.2.2.RELEASE'
+    compile 'org.springframework:spring-jdbc:4.1.6.RELEASE'
+
   	compile 'org.slf4j:slf4j-api:1.7.10'
     compile 'org.slf4j:jcl-over-slf4j:1.7.10'
     compile 'org.slf4j:log4j-over-slf4j:1.7.10'
@@ -127,6 +129,7 @@ dependencies {
     compile 'org.apache.jena:jena-arq:2.13.0'
     compile 'net.sf.opencsv:opencsv:2.3'
     compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.6.1'
+    compile 'org.postgresql:postgresql:9.4-1205-jdbc42'
     
     compile name: 't5-commons-1.0'
     compile name: 'virt_jena2'

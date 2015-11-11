@@ -132,7 +132,8 @@ public class T5RouteBuilder extends RouteBuilder {
 			.process("t5XMLProcessor")
 			.log(LoggingLevel.INFO, "T5-XML to DB.")
 			.inOnly("seda:triples")
-			.inOnly("mldb:t5xml");
+			.process("sqlProcessor");
+			//.inOnly("mldb:t5xml");
 		
 		// Convert and persist triples
 		from("seda:triples?concurrentConsumers=4") 

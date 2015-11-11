@@ -3,6 +3,8 @@ package net.sllmdilab.t5.config;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import javax.sql.DataSource;
+
 import net.sllmdilab.commons.database.MLDBClient;
 import net.sllmdilab.commons.exceptions.RosettaInitializationException;
 import net.sllmdilab.commons.t5.validators.RosettaValidator;
@@ -23,6 +25,8 @@ import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import ca.uhn.hl7v2.DefaultHapiContext;
 import ca.uhn.hl7v2.HapiContext;
@@ -150,11 +154,19 @@ public class ApplicationConfiguration extends CamelConfiguration {
 	public MLDBClient mldbClient() throws XccConfigException, URISyntaxException {
 		return new MLDBClient(contentSource());
 	}
-	
-	@Bean(name="rivtaObservationsDataFormat")
+
+	@Bean(name = "rivtaObservationsDataFormat")
 	public SoapJaxbDataFormat soapJaxbDataFormat() {
-		return new SoapJaxbDataFormat(
-				"se.riv.clinicalprocess.healthcond.basic.getobservationsresponder.v1", new ServiceInterfaceStrategy(se.riv.clinicalprocess.healthcond.basic.getobservations.v1.rivtabp21.GetObservationsResponderInterface.class, false));
+		return new SoapJaxbDataFormat("se.riv.clinicalprocess.healthcond.basic.getobservationsresponder.v1",
+				new ServiceInterfaceStrategy(
+						se.riv.clinicalprocess.healthcond.basic.getobservations.v1.rivtabp21.GetObservationsResponderInterface.class,
+						false));
+	}
+
+	@Bean
+	public DataSource dataSource() throws ClassNotFoundException {
+		Class.forName("org.postgresql.Driver");
+		return new DriverManagerDataSource("jdbc:postgresql://localhost:5432/t5db", "t5user", "password");
 	}
 	
 	@Bean
@@ -162,4 +174,8 @@ public class ApplicationConfiguration extends CamelConfiguration {
 		return new TimeAdjustmentProcessor(timeAdjustmentEnabled, timeZoneId);
 	}
 	
+	@Bean
+	public JdbcTemplate jdbcTemplate() throws ClassNotFoundException {
+		return new JdbcTemplate(dataSource());
+	}
 }

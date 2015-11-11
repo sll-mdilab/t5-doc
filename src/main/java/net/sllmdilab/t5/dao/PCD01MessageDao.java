@@ -1,12 +1,22 @@
 package net.sllmdilab.t5.dao;
 
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.List;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.transform.TransformerException;
+
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
+import org.w3c.dom.Document;
 
 import net.sll_mdilab.t5.Observation;
 import net.sll_mdilab.t5.Observations;
@@ -14,15 +24,19 @@ import net.sllmdilab.commons.database.MLDBClient;
 import net.sllmdilab.commons.exceptions.T5Exception;
 import net.sllmdilab.commons.util.T5FHIRUtils;
 
-import org.apache.commons.lang3.StringEscapeUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
 
 @Repository
 public class PCD01MessageDao {
+	private static final Logger logger = LoggerFactory.getLogger(PCD01MessageDao.class);
+
+	private static final String TABLE_T5_MESSAGE = "t5_message";
 
 	@Autowired
 	private MLDBClient mldbClient;
+	
+	@Autowired
+	private JdbcTemplate jdbcTemplate;
+
 
 	private String createQuery(String patientId, Date start, Date end, String observationTypeCode) {
 		//@formatter:off
@@ -64,5 +78,30 @@ public class PCD01MessageDao {
 		} catch (JAXBException e) {
 			throw new T5Exception("JAXB parse error.", e);
 		}
+	}
+	
+	public void insert(Document message) {
+		logger.debug("Inserting message by SQL");
+		
+		//String insertQuery = "INSERT INTO ? (?, ? ) VALUES (?, ?)";
+		
+		String insertQuery = "INSERT INTO t5_message ( time, content ) VALUES ( ?, XMLPARSE( DOCUMENT ? ))";
+		
+		//TODO: escape inputs
+		
+		String xmlContent;
+		
+		try {
+			xmlContent = T5FHIRUtils.xmlToString(message);
+		} catch (UnsupportedEncodingException | TransformerException e) {
+			throw new T5Exception("Error deserializing message", e);
+		}
+		
+		logger.debug("Writing message to db: " + xmlContent);
+		
+		int result = jdbcTemplate.update(insertQuery , new Date(), xmlContent);
+		
+		logger.debug("Message insert result = " + result);
+		
 	}
 }
