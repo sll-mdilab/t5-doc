@@ -17,11 +17,6 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import net.sllmdilab.commons.exceptions.RosettaLookupException;
-import net.sllmdilab.commons.t5.validators.RosettaValidator;
-import net.sllmdilab.commons.util.Constants;
-import net.sllmdilab.t5.exceptions.T5ConversionException;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +46,10 @@ import ca.uhn.hl7v2.model.v26.message.ORU_R01;
 import ca.uhn.hl7v2.model.v26.segment.MSH;
 import ca.uhn.hl7v2.model.v26.segment.OBX;
 import ca.uhn.hl7v2.model.v26.segment.PID;
-import ca.uhn.hl7v2.model.v26.segment.PV1;
+import net.sllmdilab.commons.exceptions.RosettaLookupException;
+import net.sllmdilab.commons.t5.validators.RosettaValidator;
+import net.sllmdilab.commons.util.Constants;
+import net.sllmdilab.t5.exceptions.T5ConversionException;
 
 public class PCD_01MessageToXMLConverter {
 
