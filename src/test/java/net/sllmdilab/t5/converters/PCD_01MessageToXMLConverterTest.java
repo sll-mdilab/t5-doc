@@ -14,9 +14,11 @@ import net.sllmdilab.t5.util.XMLHelper;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
@@ -26,6 +28,7 @@ import ca.uhn.hl7v2.model.v26.message.ORU_R01;
 import ca.uhn.hl7v2.parser.DefaultModelClassFactory;
 import ca.uhn.hl7v2.parser.Parser;
 
+@RunWith(MockitoJUnitRunner.class)
 public class PCD_01MessageToXMLConverterTest {
 	private static final String MOCK_HARMONIZED_DESC = "MOCK_HARMONIZED_DESC";
 	private static final String MOCK_HARMONIZED_UNIT = "MOCK_HARMONIZED_UNIT";

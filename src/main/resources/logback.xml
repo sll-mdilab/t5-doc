@@ -9,6 +9,9 @@
   <logger name="net.sllmdilab.t5.dao.PCD01MessageDao" level="DEBUG">
     <appender-ref ref="STDOUT" />
   </logger>
+  <logger name="net.sllmdilab.t5.dao.ObservationDao" level="DEBUG">
+    <appender-ref ref="STDOUT" />
+  </logger>
   <root level="info">
     <appender-ref ref="STDOUT" />
   </root>

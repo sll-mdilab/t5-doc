@@ -1,7 +1,9 @@
 package net.sllmdilab.t5.domain;
 
-public class SqlObservation {
+import java.util.ArrayList;
+import java.util.List;
 
+public class SqlObservation {
 	private long id;
 	private long messageId;
 	private String uid;
@@ -9,12 +11,14 @@ public class SqlObservation {
 	private String startTime;
 	private String endTime;
 	private String value;
+	private String valueType;
 	private String code;
 	private String codeSystem;
 	private String unit;
 	private String unitSystem;
 	private String sampleRate;
 	private String dataRange;
+	private List<SqlDevice> devices = new ArrayList<>();
 
 	public long getId() {
 		return id;
@@ -72,22 +76,6 @@ public class SqlObservation {
 		this.value = value;
 	}
 
-	public String getCode() {
-		return code;
-	}
-
-	public void setCode(String code) {
-		this.code = code;
-	}
-
-	public String getCodeSystem() {
-		return codeSystem;
-	}
-
-	public void setCodeSystem(String codeSystem) {
-		this.codeSystem = codeSystem;
-	}
-
 	public String getUnit() {
 		return unit;
 	}
@@ -118,5 +106,37 @@ public class SqlObservation {
 
 	public void setDataRange(String dataRange) {
 		this.dataRange = dataRange;
+	}
+
+	public List<SqlDevice> getDevices() {
+		return devices;
+	}
+
+	public void setDevices(List<SqlDevice> devices) {
+		this.devices = devices;
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
+
+	public String getCodeSystem() {
+		return codeSystem;
+	}
+
+	public void setCodeSystem(String codeSystem) {
+		this.codeSystem = codeSystem;
+	}
+
+	public String getValueType() {
+		return valueType;
+	}
+
+	public void setValueType(String valueType) {
+		this.valueType = valueType;
 	}
 }

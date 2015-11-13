@@ -53,6 +53,8 @@ import net.sllmdilab.t5.exceptions.T5ConversionException;
 
 public class PCD_01MessageToXMLConverter {
 
+	private static final String T5_XML_NAMESPACE = "http://sll-mdilab.net/T5/";
+
 	private static Logger logger = LoggerFactory.getLogger(PCD_01MessageToXMLConverter.class);
 
 	private static final String WAVEFORM_MATCH = "WAVEFORM";
@@ -74,7 +76,7 @@ public class PCD_01MessageToXMLConverter {
 
 			Element root = createRootElement(doc, msh);
 			doc.appendChild(root);
-
+			
 			root.appendChild(createSendingApplicationElement(doc, msh));
 			root.appendChild(createSendingFacilityElement(doc, msh));
 
@@ -102,7 +104,7 @@ public class PCD_01MessageToXMLConverter {
 	}
 
 	private Element createRootElement(Document doc, MSH msh) throws DataTypeException {
-		Element root = doc.createElement("PCD_01_Message");
+		Element root = doc.createElementNS(T5_XML_NAMESPACE, "PCD_01_Message");
 		root.setAttribute("id", msh.getMsh10_MessageControlID().getValueOrEmpty());
 		root.setAttribute("timeStamp", convertDtmToXmlDate(msh.getMsh7_DateTimeOfMessage()));
 		return root;

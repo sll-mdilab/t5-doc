@@ -2,6 +2,8 @@ package net.sllmdilab.t5.dao;
 
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
+import java.sql.Types;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -15,15 +17,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.PreparedStatementCreatorFactory;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
 import org.w3c.dom.Document;
 
 import net.sll_mdilab.t5.Observation;
 import net.sll_mdilab.t5.Observations;
 import net.sllmdilab.commons.database.MLDBClient;
+import net.sllmdilab.commons.exceptions.DatabaseException;
 import net.sllmdilab.commons.exceptions.T5Exception;
 import net.sllmdilab.commons.util.T5FHIRUtils;
-
 
 @Repository
 public class PCD01MessageDao {
@@ -33,10 +38,9 @@ public class PCD01MessageDao {
 
 	@Autowired
 	private MLDBClient mldbClient;
-	
+
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
-
 
 	private String createQuery(String patientId, Date start, Date end, String observationTypeCode) {
 		//@formatter:off
@@ -70,38 +74,38 @@ public class PCD01MessageDao {
 		try {
 			JAXBContext jaxbContext = JAXBContext.newInstance(Observations.class);
 			Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-			
+
 			StringReader resultReader = new StringReader(result);
-			Observations observations  = (Observations) unmarshaller.unmarshal(resultReader);
-			
+			Observations observations = (Observations) unmarshaller.unmarshal(resultReader);
+
 			return observations.getObservations();
 		} catch (JAXBException e) {
 			throw new T5Exception("JAXB parse error.", e);
 		}
 	}
-	
-	public void insert(Document message) {
+
+	public long insert(Document message) {
 		logger.debug("Inserting message by SQL");
-		
-		//String insertQuery = "INSERT INTO ? (?, ? ) VALUES (?, ?)";
-		
+
 		String insertQuery = "INSERT INTO t5_message ( time, content ) VALUES ( ?, XMLPARSE( DOCUMENT ? ))";
-		
-		//TODO: escape inputs
-		
+
 		String xmlContent;
-		
 		try {
 			xmlContent = T5FHIRUtils.xmlToString(message);
 		} catch (UnsupportedEncodingException | TransformerException e) {
 			throw new T5Exception("Error deserializing message", e);
 		}
+
+		PreparedStatementCreatorFactory pscFactory = new PreparedStatementCreatorFactory(insertQuery, Types.TIMESTAMP, Types.VARCHAR);
+		PreparedStatementCreator psc = pscFactory.newPreparedStatementCreator(Arrays.asList(new Date(), xmlContent));
 		
 		logger.debug("Writing message to db: " + xmlContent);
-		
-		int result = jdbcTemplate.update(insertQuery , new Date(), xmlContent);
-		
-		logger.debug("Message insert result = " + result);
-		
+
+		KeyHolder messageKeyHolder = new GeneratedKeyHolder();
+		if (jdbcTemplate.update(psc, messageKeyHolder) != 1) {
+			throw new DatabaseException("Message insertion failed.");
+		}
+
+		return (long) messageKeyHolder.getKey();
 	}
 }
