@@ -1,21 +1,25 @@
+TRUNCATE t5_device, t5_observation, t5_message;
+
+DROP TABLE t5_device;
+DROP TABLE t5_observation;
 DROP TABLE t5_message;
+
 CREATE TABLE t5_message (
     id              SERIAL,
-    time            TIMESTAMP,
+    time            TIMESTAMPTZ,
     content         XML,
     PRIMARY KEY (id)
 );
 
-DROP TABLE t5_observation;
 CREATE TABLE t5_observation (
     id              SERIAL,
     message_id      INTEGER REFERENCES t5_message (id),
     uid             VARCHAR (64),
-    set_id           VARCHAR (64),
-    start_time      TIMESTAMP,
-    end_time        TIMESTAMP,
+    set_id          VARCHAR (64),
+    start_time      TIMESTAMPTZ,
+    end_time        TIMESTAMPTZ,
     value           VARCHAR (10000),
-    value_type      VARCHAR (4)
+    value_type      VARCHAR (4),
     code            VARCHAR (64),
     code_system     VARCHAR (64),
     unit            VARCHAR (64),
@@ -25,7 +29,6 @@ CREATE TABLE t5_observation (
     PRIMARY KEY (id)
 );
 
-DROP TABLE t5_device;
 CREATE TABLE t5_device (
     id              SERIAL,
     device_id       VARCHAR (64),
@@ -33,3 +36,10 @@ CREATE TABLE t5_device (
     observation_id  INTEGER REFERENCES t5_observation (id),
     PRIMARY KEY (id)
 );
+
+GRANT ALL ON t5_device TO t5user;
+GRANT ALL ON t5_device_id_seq TO t5user;
+GRANT ALL ON t5_observation TO t5user;
+GRANT ALL ON t5_observation_id_seq TO t5user;
+GRANT ALL ON t5_message TO t5user;
+GRANT ALL ON t5_message_id_seq TO t5user;

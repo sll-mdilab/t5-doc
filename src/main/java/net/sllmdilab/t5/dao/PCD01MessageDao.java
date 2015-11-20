@@ -2,7 +2,11 @@ package net.sllmdilab.t5.dao;
 
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
+import java.sql.Timestamp;
 import java.sql.Types;
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -20,6 +24,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.PreparedStatementCreatorFactory;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import org.w3c.dom.Document;
 
@@ -96,9 +101,12 @@ public class PCD01MessageDao {
 			throw new T5Exception("Error deserializing message", e);
 		}
 
-		PreparedStatementCreatorFactory pscFactory = new PreparedStatementCreatorFactory(insertQuery, Types.TIMESTAMP, Types.VARCHAR);
-		PreparedStatementCreator psc = pscFactory.newPreparedStatementCreator(Arrays.asList(new Date(), xmlContent));
-		
+		PreparedStatementCreatorFactory pscFactory = new PreparedStatementCreatorFactory(insertQuery,
+				Types.TIMESTAMP, Types.VARCHAR);
+		pscFactory.setReturnGeneratedKeys(true);
+		pscFactory.setGeneratedKeysColumnNames("id");
+		PreparedStatementCreator psc = pscFactory
+				.newPreparedStatementCreator(Arrays.asList(new Date(), xmlContent));
 		logger.debug("Writing message to db: " + xmlContent);
 
 		KeyHolder messageKeyHolder = new GeneratedKeyHolder();
@@ -106,6 +114,6 @@ public class PCD01MessageDao {
 			throw new DatabaseException("Message insertion failed.");
 		}
 
-		return (long) messageKeyHolder.getKey();
+		return messageKeyHolder.getKey().longValue();
 	}
 }

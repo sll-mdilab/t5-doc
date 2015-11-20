@@ -23,18 +23,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
-
-import ca.uhn.hl7v2.DefaultHapiContext;
-import ca.uhn.hl7v2.HapiContext;
-import ca.uhn.hl7v2.conf.check.DefaultValidator;
-import ca.uhn.hl7v2.conf.check.Validator;
-import ca.uhn.hl7v2.conf.parser.ProfileParser;
-import ca.uhn.hl7v2.conf.spec.RuntimeProfile;
-import ca.uhn.hl7v2.parser.CanonicalModelClassFactory;
 
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.DatabaseClientFactory;
@@ -44,10 +35,21 @@ import com.marklogic.xcc.ContentSource;
 import com.marklogic.xcc.ContentSourceFactory;
 import com.marklogic.xcc.exceptions.XccConfigException;
 
+import ca.uhn.hl7v2.DefaultHapiContext;
+import ca.uhn.hl7v2.HapiContext;
+import ca.uhn.hl7v2.conf.check.DefaultValidator;
+import ca.uhn.hl7v2.conf.check.Validator;
+import ca.uhn.hl7v2.conf.parser.ProfileParser;
+import ca.uhn.hl7v2.conf.spec.RuntimeProfile;
+import ca.uhn.hl7v2.parser.CanonicalModelClassFactory;
+
 @Configuration
 public class ApplicationConfiguration extends CamelConfiguration {
 	private static Logger logger = LoggerFactory.getLogger(ApplicationConfiguration.class);
 
+	@Value("${JDBC_CONNECTION_STRING}")
+	private String jdbcConnectionString;
+	
 	@Value("${T5_DATABASE_HOST}")
 	private String databaseHost;
 
@@ -166,7 +168,7 @@ public class ApplicationConfiguration extends CamelConfiguration {
 	@Bean
 	public DataSource dataSource() throws ClassNotFoundException {
 		Class.forName("org.postgresql.Driver");
-		return new DriverManagerDataSource("jdbc:postgresql://localhost:5432/t5db", "t5user", "password");
+		return new DriverManagerDataSource(jdbcConnectionString);
 	}
 	
 	@Bean

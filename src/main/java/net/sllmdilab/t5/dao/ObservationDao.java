@@ -1,7 +1,7 @@
 package net.sllmdilab.t5.dao;
 
+import java.sql.Types;
 import java.util.Arrays;
-import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,9 +12,9 @@ import org.springframework.jdbc.core.PreparedStatementCreatorFactory;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
 
+import net.sllmdilab.commons.domain.SqlDevice;
+import net.sllmdilab.commons.domain.SqlObservation;
 import net.sllmdilab.commons.exceptions.DatabaseException;
-import net.sllmdilab.t5.domain.SqlDevice;
-import net.sllmdilab.t5.domain.SqlObservation;
 
 @Repository
 public class ObservationDao {
@@ -24,8 +24,10 @@ public class ObservationDao {
 	private JdbcTemplate jdbcTemplate;
 
 	public long insert(SqlObservation observation) {
+		logger.debug("Inserting Observation by SQL.");
+
 		long obsId = insertObservation(observation);
-		
+
 		for (SqlDevice device : observation.getDevices()) {
 			device.setObservationId(obsId);
 			insertDevice(device, obsId);
@@ -50,15 +52,31 @@ public class ObservationDao {
 			"unit_system, " + 
 			"sample_rate, " + 
 			"data_range ) "
-			+ "VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ))";
+			+ "VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )";
 		//@formatter:on
 
 		logger.debug("Writing observation to db.");
 
 		GeneratedKeyHolder obsKeyHolder = new GeneratedKeyHolder();
-		if (jdbcTemplate.update(insertObsQuery, new Date(), obsKeyHolder) != 1) {
-			PreparedStatementCreatorFactory pscFactory = new PreparedStatementCreatorFactory(insertObsQuery);
-			//@formatter:off
+		//@formatter:off
+		PreparedStatementCreatorFactory pscFactory = new PreparedStatementCreatorFactory(insertObsQuery,
+				Types.INTEGER, 
+				Types.VARCHAR, 
+				Types.VARCHAR,
+				Types.TIMESTAMP,
+				Types.TIMESTAMP,
+				Types.VARCHAR,
+				Types.VARCHAR,
+				Types.VARCHAR,
+				Types.VARCHAR,
+				Types.VARCHAR,
+				Types.VARCHAR,
+				Types.VARCHAR,
+				Types.VARCHAR
+				);
+		pscFactory.setReturnGeneratedKeys(true);
+		pscFactory.setGeneratedKeysColumnNames("id");
+		//@formatter:off
 			PreparedStatementCreator psc = pscFactory.newPreparedStatementCreator(Arrays.asList(
 					observation.getMessageId(),
 					observation.getUid(),
@@ -74,20 +92,20 @@ public class ObservationDao {
 					observation.getSampleRate(),
 					observation.getDataRange()));
 			//@formatter:on
-			jdbcTemplate.update(psc, obsKeyHolder);
-			
-			
+
+		logger.debug("Writing device ID to db.");
+		if (jdbcTemplate.update(psc, obsKeyHolder) != 1) {
 			throw new DatabaseException("Observation insertion failed, zero rows updated.");
 		}
-		
-		return (long) obsKeyHolder.getKey();
+
+		return obsKeyHolder.getKey().longValue();
 	}
-	
 
 	private void insertDevice(SqlDevice device, long observationId) {
 		String insertObsQuery = "INSERT INTO t5_device ( device_id, level, observation_id ) VALUES ( ?, ?, ?)";
 
-		logger.debug("Writing device ID to db.");;
+		logger.debug("Writing device ID to db.");
+
 		if (jdbcTemplate.update(insertObsQuery, device.getDeviceId(), device.getLevel(), observationId) != 1) {
 			throw new DatabaseException("Device ID insertion failed, zero rows updated.");
 		}

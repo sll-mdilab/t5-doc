@@ -83,6 +83,7 @@ public class T5RouteBuilder extends RouteBuilder {
 				.stop()
 				.end()
 			.unmarshal(hl7DataFormat)
+			.process("timeAdjustmentProcessor")
 			.log(LoggingLevel.INFO, "Performing data injection.")
 			.process("dataInjectionProcessor")			
 			.log(LoggingLevel.INFO, "Extracting device IDs.")

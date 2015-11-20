@@ -4,13 +4,14 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
+import java.util.Iterator;
+
+import javax.xml.XMLConstants;
+import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-
-import net.sllmdilab.commons.t5.validators.RosettaValidator;
-import net.sllmdilab.t5.util.XMLHelper;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -27,6 +28,8 @@ import ca.uhn.hl7v2.HapiContext;
 import ca.uhn.hl7v2.model.v26.message.ORU_R01;
 import ca.uhn.hl7v2.parser.DefaultModelClassFactory;
 import ca.uhn.hl7v2.parser.Parser;
+import net.sllmdilab.commons.t5.validators.RosettaValidator;
+import net.sllmdilab.t5.util.XMLHelper;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PCD_01MessageToXMLConverterTest {
@@ -69,8 +72,25 @@ public class PCD_01MessageToXMLConverterTest {
 	@Before
 	public void init() throws Exception {
 
+		NamespaceContext nsContext = new NamespaceContext() {
+		    public String getNamespaceURI(String prefix) {
+		    	if(prefix.equals(XMLConstants.DEFAULT_NS_PREFIX)) {
+		    		return PCD_01MessageToXMLConverter.T5_XML_NAMESPACE;
+		    	}
+		    	
+		        return prefix.equals("t5") ? PCD_01MessageToXMLConverter.T5_XML_NAMESPACE : null; 
+		    }
+		    public Iterator getPrefixes(String val) {
+		        return null;
+		    }
+		    public String getPrefix(String uri) {
+		        return null;
+		    }
+		};
+		
 		XPathFactory xpathfactory = XPathFactory.newInstance();
 		xPath = xpathfactory.newXPath();
+		xPath.setNamespaceContext(nsContext);
 
 		MockitoAnnotations.initMocks(this);
 
@@ -95,7 +115,7 @@ public class PCD_01MessageToXMLConverterTest {
 		assertEquals(
 				"1.11.2.3",
 				stringXPath(
-						"/PCD_01_Message/Patient_Result/Order_Observations/MDS/VMD/CHAN/Metric/Observation/@hierarchy",
+						"/t5:PCD_01_Message/Patient_Result/Order_Observations/MDS/VMD/CHAN/Metric/Observation/@hierarchy",
 						xmlDocument));
 	}
 
@@ -112,22 +132,22 @@ public class PCD_01MessageToXMLConverterTest {
 		XMLHelper.prettyPrintDocument(xmlDocument, System.out);
 		NodeList nodes = null; 
 	
-		nodes = nodeListXPath("/PCD_01_Message/Patient_Result/Order_Observations", xmlDocument);
+		nodes = nodeListXPath("/t5:PCD_01_Message/Patient_Result/Order_Observations", xmlDocument);
 		assertEquals(2, nodes.getLength());
 		
-		nodes = nodeListXPath("/PCD_01_Message/Patient_Result/Order_Observations[1]/MDS", xmlDocument);
+		nodes = nodeListXPath("/t5:PCD_01_Message/Patient_Result/Order_Observations[1]/MDS", xmlDocument);
 		assertEquals(1, nodes.getLength());
 		
-		nodes = nodeListXPath("/PCD_01_Message/Patient_Result/Order_Observations[1]/MDS/VMD/CHAN/Metric", xmlDocument);
+		nodes = nodeListXPath("/t5:PCD_01_Message/Patient_Result/Order_Observations[1]/MDS/VMD/CHAN/Metric", xmlDocument);
 		assertEquals(2, nodes.getLength());
 		
-		nodes = nodeListXPath("/PCD_01_Message/Patient_Result/Order_Observations[1]/MDS/VMD/CHAN/Metric[1]/*", xmlDocument);
+		nodes = nodeListXPath("/t5:PCD_01_Message/Patient_Result/Order_Observations[1]/MDS/VMD/CHAN/Metric[1]/*", xmlDocument);
 		assertEquals(3, nodes.getLength());
 		
-		nodes = nodeListXPath("/PCD_01_Message/Patient_Result/Order_Observations[1]/MDS/VMD/CHAN/Metric[1]/Facet", xmlDocument);
+		nodes = nodeListXPath("/t5:PCD_01_Message/Patient_Result/Order_Observations[1]/MDS/VMD/CHAN/Metric[1]/Facet", xmlDocument);
 		assertEquals(2, nodes.getLength());
 		
-		String obsId = stringXPath("/PCD_01_Message/Patient_Result/Order_Observations[1]/MDS/VMD/CHAN/Metric[1]/Observation[@hierarchy='1.1.1.1001']/ObsIdentifier", xmlDocument);
+		String obsId = stringXPath("/t5:PCD_01_Message/Patient_Result/Order_Observations[1]/MDS/VMD/CHAN/Metric[1]/Observation[@hierarchy='1.1.1.1001']/ObsIdentifier", xmlDocument);
 		assertEquals("MDC_ECG_LEAD_I", obsId);
 
 	}

@@ -8,10 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 
+import net.sllmdilab.commons.domain.SqlObservation;
 import net.sllmdilab.t5.converters.PCD_01MessageToSqlObservationsConverter;
 import net.sllmdilab.t5.dao.ObservationDao;
 import net.sllmdilab.t5.dao.PCD01MessageDao;
-import net.sllmdilab.t5.domain.SqlObservation;
 
 @Component
 public class SqlProcessor implements Processor {

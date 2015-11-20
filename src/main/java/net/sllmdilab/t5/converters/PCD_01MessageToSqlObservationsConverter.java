@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBContext;
@@ -23,13 +24,12 @@ import net.sll_mdilab.t5.Observation;
 import net.sll_mdilab.t5.Observation.ObsIdentifier;
 import net.sll_mdilab.t5.PCD01Message;
 import net.sll_mdilab.t5.VMD;
+import net.sllmdilab.commons.domain.SqlDevice;
+import net.sllmdilab.commons.domain.SqlObservation;
 import net.sllmdilab.commons.exceptions.T5Exception;
-import net.sllmdilab.t5.domain.SqlDevice;
-import net.sllmdilab.t5.domain.SqlObservation;
 
 @Component
 public class PCD_01MessageToSqlObservationsConverter {
-
 	private static class IdItem {
 		public final String level;
 		public final String id;
@@ -49,12 +49,10 @@ public class PCD_01MessageToSqlObservationsConverter {
 	}
 
 	public List<SqlObservation> convertToSqlObservations(Document document) {
-		JAXBContext jaxbContext;
 		try {
+			JAXBContext jaxbContext;
 			jaxbContext = JAXBContext.newInstance(PCD01Message.class);
-
 			Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-
 			PCD01Message message = (PCD01Message) unmarshaller.unmarshal(document);
 
 			final List<SqlObservation> result = new ArrayList<>();
@@ -120,8 +118,8 @@ public class PCD_01MessageToSqlObservationsConverter {
 					}
 				}
 
-				if (obs.getUnit() != null && !StringUtils.isBlank(obs.getUnit().getValue())) {
-					sqlObservation.setUnit(obs.getUnit().getValue());
+				if (obs.getTimestamp() != null) {
+					sqlObservation.setStartTime(obs.getTimestamp().getValue().toGregorianCalendar(TimeZone.getTimeZone("UTC"), null, null).getTime());
 				}
 
 				if (obs.getUnit() != null) {
@@ -135,6 +133,10 @@ public class PCD_01MessageToSqlObservationsConverter {
 						sqlObservation.setUnitSystem(system);
 					}
 				}
+
+				sqlObservation.setSetId(obs.getSetid());
+
+				sqlObservation.setUid(obs.getUid());
 
 				sqlObservation.setDevices(createSqlDevices(idStack));
 
@@ -158,16 +160,22 @@ public class PCD_01MessageToSqlObservationsConverter {
 		List<IdItem> result = new ArrayList<>();
 		objects.forEach(object -> {
 			if (object instanceof Observation) {
-				Observation obs = (Observation) object;
-				EquipmentIdentifier equipmentIdentifier = obs.getEquipmentIdentifier();
-				if (equipmentIdentifier != null) {
-					String id = equipmentIdentifier.getValue();
-					if (!StringUtils.isBlank(id)) {
-						result.add(IdItem.of(level, id));
-					}
-				}
+				result.addAll(extractId(level, (Observation) object));
 			}
 		});
+
+		return result;
+	}
+
+	private List<IdItem> extractId(String level, Observation obs) {
+		List<IdItem> result = new ArrayList<>(1);
+		EquipmentIdentifier equipmentIdentifier = obs.getEquipmentIdentifier();
+		if (equipmentIdentifier != null) {
+			String id = equipmentIdentifier.getValue();
+			if (!StringUtils.isBlank(id)) {
+				result.add(IdItem.of(level, id));
+			}
+		}
 
 		return result;
 	}
