@@ -72,14 +72,14 @@ public class T5RouteBuilder extends RouteBuilder {
 				.handled(true)
 				.log(LoggingLevel.INFO, "Exception caught, responding with Application Reject ACK.")
 				.transform(ack(AcknowledgmentCode.AR))
-				.inOnly("seda:ack")
+//				.inOnly("seda:ack")
 				.stop()
 				.end()
 			.onException(Exception.class)
 				.handled(true)
 				.log(LoggingLevel.INFO, "Exception caught, Responding with Application Error ACK.")
 				.transform(ack(AcknowledgmentCode.AE))
-				.inOnly("seda:ack")
+//				.inOnly("seda:ack")
 				.stop()
 				.end()
 			.unmarshal(hl7DataFormat)
@@ -96,35 +96,35 @@ public class T5RouteBuilder extends RouteBuilder {
 			.choice()
 				.when(header(ProfileValidationProcessor.VALIDATION_ERRORS_HEADER).isNotNull())
 				    .log(LoggingLevel.INFO, "Message contained validation errors.")
-				    .inOnly("seda:standardxml")
+//				    .inOnly("seda:standardxml")
 					.inOnly("seda:t5xml")
 					.transform(ack(AcknowledgmentCode.AA))
 					.process("validationErrorAckProcessor")
-					.inOnly("seda:ack")
+//					.inOnly("seda:ack")
 					.endChoice()
 				.otherwise()
 					.log(LoggingLevel.INFO, "No validation errors detected.")
 					.inOnly("seda:standardxml")
 					.inOnly("seda:t5xml")
-					.transform(ack())
-					.inOnly("seda:ack");
+					.transform(ack());
+//					.inOnly("seda:ack");
 		
 		// Convert and persist an ORU_R01 message as HL7 Standard XML
-		from("seda:standardxml") 
-			.routeId("standardXMLRoute")
-			.log(LoggingLevel.INFO, "Converting to HL7v2 Standard-XML.")
-			.process("standardHL7XMLProcessor")
-			.log(LoggingLevel.INFO, "Saving Standard-XML to DB.")
-			.to("mldb:standardxml");
+//		from("seda:standardxml") 
+//			.routeId("standardXMLRoute")
+//			.log(LoggingLevel.INFO, "Converting to HL7v2 Standard-XML.")
+//			.process("standardHL7XMLProcessor")
+//			.log(LoggingLevel.INFO, "Saving Standard-XML to DB.")
+//			.to("mldb:standardxml");
 		
 		// Convert and persist an ACK-message as HL7 Standard XML
-		from("seda:ack") 
-			.routeId("ackStandardXMLRoute")
-			.log(LoggingLevel.INFO, "Converting ACK to HL7v2 Standard-XML.")
-			.process("standardHL7XMLProcessor")
-			.log(LoggingLevel.INFO, "Saving ACK Standard-XML to DB.")
-			.inOnly("seda:triples")
-			.inOnly("mldb:ack");
+//		from("seda:ack") 
+//			.routeId("ackStandardXMLRoute")
+//			.log(LoggingLevel.INFO, "Converting ACK to HL7v2 Standard-XML.")
+//			.process("standardHL7XMLProcessor")
+//			.log(LoggingLevel.INFO, "Saving ACK Standard-XML to DB.")
+//			.inOnly("seda:triples")
+//			.inOnly("mldb:ack");
 		
 		// Convert and persist an ORU_R01 message as T5-XML
 		from("seda:t5xml") 
@@ -134,7 +134,6 @@ public class T5RouteBuilder extends RouteBuilder {
 			.log(LoggingLevel.INFO, "T5-XML to DB.")
 			.inOnly("seda:triples")
 			.process("sqlProcessor");
-			//.inOnly("mldb:t5xml");
 		
 		// Convert and persist triples
 		from("seda:triples?concurrentConsumers=4") 
@@ -170,17 +169,5 @@ public class T5RouteBuilder extends RouteBuilder {
 			.log(LoggingLevel.INFO, "Unable to deliver HL7v2 message.")
 			.to("log:hl7DeadLetter?level=INFO");
 		
-		// RIV-TA producer for observation data
-//		from("jetty:http://0.0.0.0:8686/clinicalprocess/healthcond/basic/GetObservations/1/rivtabp21?enableJmx=true")
-//				.onException(Exception.class)
-//				    .handled(true)
-//				    .marshal(rivtaObservationsDataFormat)
-//				    .end()
-//				.log(LoggingLevel.INFO, "Got GetObserations SOAP request.")
-//				.unmarshal(rivtaObservationsDataFormat)
-//				.process("rivtaGetObservationsProcessor")
-//				.marshal(rivtaObservationsDataFormat);
-		//@formatter:on
-
 	}
 }

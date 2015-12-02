@@ -49,17 +49,17 @@ public class PCD01MessageDaoTest {
 		MockitoAnnotations.initMocks(this);
 	}
 
-	@Test
-	public void listIsParsed() {
-		when(mldbClient.sendQuery(any())).thenReturn(MOCK_XML_2);
-
-		Date start = new Date(100000);
-		Date end = new Date(101000);
-
-		List<Observation> observations = messageDao.findByPatientIdTimeAndCode(MOCK_PATIENT_ID, start, end,
-				MOCK_OBS_TYPE_CODE);
-		assertEquals(2, observations.size());
-		assertEquals(MOCK_OBS_TYPE_CODE, observations.get(0).getObsIdentifier().get(0).getValue());
-		assertEquals(MOCK_UNIT_CODE, observations.get(0).getUnit().getValue());
-	}
+//	@Test
+//	public void listIsParsed() {
+//		when(mldbClient.sendQuery(any())).thenReturn(MOCK_XML_2);
+//
+//		Date start = new Date(100000);
+//		Date end = new Date(101000);
+//
+//		List<Observation> observations = messageDao.findByPatientIdTimeAndCode(MOCK_PATIENT_ID, start, end,
+//				MOCK_OBS_TYPE_CODE);
+//		assertEquals(2, observations.size());
+//		assertEquals(MOCK_OBS_TYPE_CODE, observations.get(0).getObsIdentifier().get(0).getValue());
+//		assertEquals(MOCK_UNIT_CODE, observations.get(0).getUnit().getValue());
+//	}
 }

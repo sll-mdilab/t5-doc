@@ -37,9 +37,12 @@ CREATE TABLE t5_device (
     PRIMARY KEY (id)
 );
 
-GRANT ALL ON t5_device TO t5user;
-GRANT ALL ON t5_device_id_seq TO t5user;
-GRANT ALL ON t5_observation TO t5user;
-GRANT ALL ON t5_observation_id_seq TO t5user;
-GRANT ALL ON t5_message TO t5user;
-GRANT ALL ON t5_message_id_seq TO t5user;
+CREATE INDEX t5_observation_start_time_idx ON t5_observation (start_time);
+CREATE INDEX t5_observation_code_idx ON t5_observation (code);
+CREATE INDEX t5_device_device_id_idx ON t5_device (device_id);
+
+SET plv8.start_proc = 'plv8_init';
+SELECT fhir_create_storage('{"resourceType": "DeviceUseStatement"}');
+
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO t5user;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO t5user;
