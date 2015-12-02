@@ -67,6 +67,11 @@ sourceSets {
   main {
     compileClasspath += sourceSets.generated.runtimeClasspath
   }
+  
+  test {
+    compileClasspath += sourceSets.generated.runtimeClasspath
+    runtimeClasspath += sourceSets.generated.runtimeClasspath
+  }
 }
 
 task integrationTest(type: Test) {
