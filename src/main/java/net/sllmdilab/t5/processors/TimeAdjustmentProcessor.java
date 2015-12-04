@@ -5,6 +5,8 @@ import java.util.TimeZone;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.DataTypeException;
@@ -14,9 +16,11 @@ import ca.uhn.hl7v2.model.v26.group.ORU_R01_OBSERVATION;
 import ca.uhn.hl7v2.model.v26.group.ORU_R01_ORDER_OBSERVATION;
 import ca.uhn.hl7v2.model.v26.group.ORU_R01_PATIENT_RESULT;
 import ca.uhn.hl7v2.model.v26.message.ORU_R01;
+import net.sllmdilab.t5.dao.ObservationDao;
 
 public class TimeAdjustmentProcessor implements Processor {
-
+	private static final Logger logger = LoggerFactory.getLogger(TimeAdjustmentProcessor.class);
+	
 	private static final int MILLIS_PER_MINUTE = 60 * 1000;
 	private static final int MILLIS_PER_HOUR = MILLIS_PER_MINUTE * 60;
 
@@ -31,6 +35,8 @@ public class TimeAdjustmentProcessor implements Processor {
 	@Override
 	public void process(Exchange exchange) throws Exception {
 		if (timeAdjustmentEnabled) {
+			logger.info("Adjusting timestamps.");
+			
 			Message message = exchange.getIn().getBody(Message.class);
 			ORU_R01 oruMessage = (ORU_R01) message;
 

@@ -6,10 +6,12 @@ import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.UUID;
 
+import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
@@ -53,6 +55,8 @@ import net.sllmdilab.t5.exceptions.T5ConversionException;
 
 public class PCD_01MessageToXMLConverter {
 
+	public static final String T5_XML_NAMESPACE = "http://sll-mdilab.net/T5/";
+
 	private static Logger logger = LoggerFactory.getLogger(PCD_01MessageToXMLConverter.class);
 
 	private static final String WAVEFORM_MATCH = "WAVEFORM";
@@ -74,7 +78,7 @@ public class PCD_01MessageToXMLConverter {
 
 			Element root = createRootElement(doc, msh);
 			doc.appendChild(root);
-
+			
 			root.appendChild(createSendingApplicationElement(doc, msh));
 			root.appendChild(createSendingFacilityElement(doc, msh));
 
@@ -102,7 +106,7 @@ public class PCD_01MessageToXMLConverter {
 	}
 
 	private Element createRootElement(Document doc, MSH msh) throws DataTypeException {
-		Element root = doc.createElement("PCD_01_Message");
+		Element root = doc.createElementNS(T5_XML_NAMESPACE, "PCD_01_Message");
 		root.setAttribute("id", msh.getMsh10_MessageControlID().getValueOrEmpty());
 		root.setAttribute("timeStamp", convertDtmToXmlDate(msh.getMsh7_DateTimeOfMessage()));
 		return root;
@@ -484,6 +488,19 @@ public class PCD_01MessageToXMLConverter {
 			// Find parent timestamp
 			String xpathExpr = "../../Observation/Timestamp";
 			XPath mXpath = XPathFactory.newInstance().newXPath();
+			NamespaceContext nsContext = new NamespaceContext() {
+			    public String getNamespaceURI(String prefix) {
+			        return prefix.equals("t5") ? T5_XML_NAMESPACE : null; 
+			    }
+			    public Iterator getPrefixes(String val) {
+			        return null;
+			    }
+			    public String getPrefix(String uri) {
+			        return null;
+			    }
+			};
+			mXpath.setNamespaceContext(nsContext);
+			
 			Object timenode = mXpath.evaluate(xpathExpr, elemObs, XPathConstants.NODE);
 			if (timenode != null && timenode instanceof Node) {
 				tsParent = ((Element) timenode).getTextContent();

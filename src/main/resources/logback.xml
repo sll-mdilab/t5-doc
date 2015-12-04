@@ -6,7 +6,12 @@
       <Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</Pattern>
     </layout>
   </appender>
- 
+  <logger name="net.sllmdilab.t5.dao.PCD01MessageDao" level="DEBUG" additivity="false">
+    <appender-ref ref="STDOUT" />
+  </logger>
+  <logger name="net.sllmdilab.t5.dao.ObservationDao" level="DEBUG" additivity="false">
+    <appender-ref ref="STDOUT" />
+  </logger>
   <root level="info">
     <appender-ref ref="STDOUT" />
   </root>
