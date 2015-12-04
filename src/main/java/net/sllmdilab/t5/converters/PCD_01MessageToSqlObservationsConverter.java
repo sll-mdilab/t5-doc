@@ -91,11 +91,15 @@ public class PCD_01MessageToSqlObservationsConverter {
 			}
 		});
 
-		for (int i = 0; i < items.size(); ++i) {
-			idStack.pop();
-		}
+		pop(idStack, items.size());
 
 		return result;
+	}
+
+	private void pop(Deque<?> idStack, int numItems) {
+		for (int i = 0; i < numItems; ++i) {
+			idStack.pop();
+		}
 	}
 
 	private List<SqlObservation> getSqlObservations(String level, List<Object> objects, Deque<IdItem> idStack) {
@@ -105,39 +109,13 @@ public class PCD_01MessageToSqlObservationsConverter {
 				Observation obs = (Observation) object;
 				SqlObservation sqlObservation = new SqlObservation();
 
-				if (obs.getValue() != null && !obs.getValue().isEmpty()) {
-					sqlObservation.setValue(obs.getValue().get(0).getValue());
-					sqlObservation.setValueType(obs.getValue().get(0).getTypeHL7V2());
-				}
-
-				for (ObsIdentifier identifier : obs.getObsIdentifier()) {
-					if (identifier.isIsAlternate() != Boolean.TRUE) {
-						sqlObservation.setCode(identifier.getValue());
-						sqlObservation.setCodeSystem(identifier.getCodingSystemName());
-						break;
-					}
-				}
-
-				if (obs.getTimestamp() != null) {
-					sqlObservation.setStartTime(obs.getTimestamp().getValue().toGregorianCalendar(TimeZone.getTimeZone("UTC"), null, null).getTime());
-				}
-
-				if (obs.getUnit() != null) {
-					String value = obs.getUnit().getValue();
-					if (!StringUtils.isBlank(value)) {
-						sqlObservation.setUnit(value);
-					}
-
-					String system = obs.getUnit().getCodingSystemName();
-					if (!StringUtils.isBlank(system)) {
-						sqlObservation.setUnitSystem(system);
-					}
-				}
+				convertValue(obs, sqlObservation);
+				convertIdentifier(obs, sqlObservation);
+				convertTimestamp(obs, sqlObservation);
+				convertUnits(obs, sqlObservation);
 
 				sqlObservation.setSetId(obs.getSetid());
-
 				sqlObservation.setUid(obs.getUid());
-
 				sqlObservation.setDevices(createSqlDevices(idStack));
 
 				result.add(sqlObservation);
@@ -145,6 +123,43 @@ public class PCD_01MessageToSqlObservationsConverter {
 		});
 
 		return result;
+	}
+
+	private void convertUnits(Observation obs, SqlObservation sqlObservation) {
+		if (obs.getUnit() != null) {
+			String value = obs.getUnit().getValue();
+			if (!StringUtils.isBlank(value)) {
+				sqlObservation.setUnit(value);
+			}
+
+			String system = obs.getUnit().getCodingSystemName();
+			if (!StringUtils.isBlank(system)) {
+				sqlObservation.setUnitSystem(system);
+			}
+		}
+	}
+
+	private void convertTimestamp(Observation obs, SqlObservation sqlObservation) {
+		if (obs.getTimestamp() != null) {
+			sqlObservation.setStartTime(obs.getTimestamp().getValue().toGregorianCalendar(TimeZone.getTimeZone("UTC"), null, null).getTime());
+		}
+	}
+
+	private void convertIdentifier(Observation obs, SqlObservation sqlObservation) {
+		for (ObsIdentifier identifier : obs.getObsIdentifier()) {
+			if (identifier.isIsAlternate() != Boolean.TRUE) {
+				sqlObservation.setCode(identifier.getValue());
+				sqlObservation.setCodeSystem(identifier.getCodingSystemName());
+				break;
+			}
+		}
+	}
+
+	private void convertValue(Observation obs, SqlObservation sqlObservation) {
+		if (obs.getValue() != null && !obs.getValue().isEmpty()) {
+			sqlObservation.setValue(obs.getValue().get(0).getValue());
+			sqlObservation.setValueType(obs.getValue().get(0).getTypeHL7V2());
+		}
 	}
 
 	private List<SqlDevice> createSqlDevices(Deque<IdItem> items) {

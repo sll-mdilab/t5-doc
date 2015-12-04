@@ -52,7 +52,7 @@ public class TimeAdjustmentProcessorTest {
 	//@formatter:on
 	
 	@InjectMocks
-	private TimeAdjustmentProcessor timeAdjustmentProcessor = new TimeAdjustmentProcessor(true, "Europe/Stockholm");
+	private TimeAdjustmentProcessor timeAdjustmentProcessor = new TimeAdjustmentProcessor(true, "GMT+2:00");
 	
 	private CamelContext camelContext;
 	private HapiContext hapiContext;
