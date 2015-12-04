@@ -43,6 +43,11 @@ CREATE INDEX t5_device_device_id_idx ON t5_device (device_id);
 
 SET plv8.start_proc = 'plv8_init';
 SELECT fhir_create_storage('{"resourceType": "DeviceUseStatement"}');
+SELECT fhir_create_storage('{"resourceType": "Encounter"}');
+SELECT fhir_create_storage('{"resourceType": "Device"}');
+SELECT fhir_create_storage('{"resourceType": "Patient"}');
+SELECT fhir_create_storage('{"resourceType": "Practitioner"}');
+SELECT fhir_create_storage('{"resourceType": "BrokeringReceiver"}');
 
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO t5user;
 GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO t5user;

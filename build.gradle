@@ -130,6 +130,7 @@ dependencies {
     compile 'net.sf.opencsv:opencsv:2.3'
     compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.6.1'
     compile 'org.postgresql:postgresql:9.4-1205-jdbc42'
+    compile 'org.apache.commons:commons-dbcp2:2.1.1'
     
     compile name: 't5-commons-1.0'
     compile name: 'virt_jena2'

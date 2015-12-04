@@ -5,19 +5,13 @@ import java.net.URISyntaxException;
 
 import javax.sql.DataSource;
 
-import net.sllmdilab.commons.database.MLDBClient;
-import net.sllmdilab.commons.exceptions.RosettaInitializationException;
-import net.sllmdilab.commons.t5.validators.RosettaValidator;
-import net.sllmdilab.t5.converters.PCD_01MessageToXMLConverter;
-import net.sllmdilab.t5.converters.XMLToRDFConverter;
-import net.sllmdilab.t5.processors.TimeAdjustmentProcessor;
-
 import org.apache.camel.component.hl7.HL7DataFormat;
 import org.apache.camel.component.hl7.HL7MLLPNettyDecoderFactory;
 import org.apache.camel.component.hl7.HL7MLLPNettyEncoderFactory;
 import org.apache.camel.dataformat.soap.SoapJaxbDataFormat;
 import org.apache.camel.dataformat.soap.name.ServiceInterfaceStrategy;
 import org.apache.camel.spring.javaconfig.CamelConfiguration;
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,7 +19,6 @@ import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.DatabaseClientFactory;
@@ -42,6 +35,12 @@ import ca.uhn.hl7v2.conf.check.Validator;
 import ca.uhn.hl7v2.conf.parser.ProfileParser;
 import ca.uhn.hl7v2.conf.spec.RuntimeProfile;
 import ca.uhn.hl7v2.parser.CanonicalModelClassFactory;
+import net.sllmdilab.commons.database.MLDBClient;
+import net.sllmdilab.commons.exceptions.RosettaInitializationException;
+import net.sllmdilab.commons.t5.validators.RosettaValidator;
+import net.sllmdilab.t5.converters.PCD_01MessageToXMLConverter;
+import net.sllmdilab.t5.converters.XMLToRDFConverter;
+import net.sllmdilab.t5.processors.TimeAdjustmentProcessor;
 
 @Configuration
 public class ApplicationConfiguration extends CamelConfiguration {
@@ -165,10 +164,15 @@ public class ApplicationConfiguration extends CamelConfiguration {
 						false));
 	}
 
-	@Bean
+	@Bean(destroyMethod="close")
 	public DataSource dataSource() throws ClassNotFoundException {
-		Class.forName("org.postgresql.Driver");
-		return new DriverManagerDataSource(jdbcConnectionString);
+		BasicDataSource dataSource = new BasicDataSource();
+		dataSource.setUrl(jdbcConnectionString);
+		dataSource.setDriverClassName("org.postgresql.Driver");
+		dataSource.setPoolPreparedStatements(true);
+		dataSource.setMaxTotal(10);
+		dataSource.setMaxIdle(10);
+		return dataSource;
 	}
 	
 	@Bean
