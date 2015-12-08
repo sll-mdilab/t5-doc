@@ -17,7 +17,7 @@ springBoot {
 }
 
 sourceCompatibility = 1.8
-version = '0.5'
+version = '0.6'
 
 def camelVersion = "2.16.0"
 
