@@ -43,9 +43,9 @@ This outputs a .war-file into the `build/lib` directory.
 
 ## Database setup
 A script for initializing all required database schema can be found at `sql/initialize.sql`.
-Example:
+Example usage:
 ```
-psql [database or connection uri] < sql/initialize.sql
+psql [database name or connection uri] < sql/initialize.sql
 ```
 
 ## Deployment
