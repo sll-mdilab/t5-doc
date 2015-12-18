@@ -12,17 +12,20 @@ If a message fails structural validation according to IHE PCD01 profile, the ser
 ## Data output/persistence
 The ingested HL7v2 ORU-01 message will be saved in 3 different formats for ease of analysis.
 
-* The following formats are used to store messages in an XML document database.
+* The following formats are used to store messages as XML fields in an SQL database.
   * A custom XML format (T5 XML) which has a structure that follows the IHE PCD01-specified containment tree.
-  * HL7v2 XML format.
+  * HL7v2 standard XML format.
 * The following format is used for storage in an RDF triple store.
   * HL7v2 XML converted to RDF triples.
 
-The ACK-messages sent in response by the server is also persisted as HL7v2 XML and RDF triples.
+Observation data is also extracted from messages and stored driectly in SQL tables with separate fields for value, timestamp and a handfull of other data.
+
+The ACK-messages sent in response by the server is also persisted as HL7v2 XML and optionally as RDF triples.
 
 ## Databases
-### XML Document Database
-The application requires access to a Mark Logic >= 8.0 database in which to store ingested messages as well as outgoing ACK-messages.
+
+### SQL Database
+The application requires access to a PostgerSQL>=v9.4 database in which to store ingested messages as well as outgoing ACK-messages.
 
 ### RDF triple store
 Optionally, the application can also store messages as RDF triples to aid further analysis and validation. This requires access to an OpenLink Virtuoso triple store. It has been tested with Virtuoso Open-Source Edition 7.2.1.
@@ -34,30 +37,32 @@ Before building the project, make sure to download the `virtjena_2.jar` and `vir
 
 Assuming that Java EE 8 development kit is installed and exist on the PATH environment variable, the project can be built with the following command from the project root folder:
 
-    ./gradlew build fatJar
+    ./gradlew build
 
-This outputs a .jar-file into the `build/lib` directory.
+This outputs a .war-file into the `build/lib` directory.
+
+## Database setup
+A script for initializing all required database schema can be found at `sql/initialize.sql`.
+Example:
+```
+psql [database or connection uri] < sql/initialize.sql
+```
 
 ## Deployment
-
-The application is a stand-alone Java program which can be run with a compatible Java virtual machine, e. g:
-
-    java -jar t5poc.jar
+The build process produces a servlet contained in a .war-file which can be deployed on any compatible Java servlet container. It has been tested with Apache Tomcat 8.0.
 
 The application uses the following environment variables:
 
-* `T5_DATABASE_HOST` - IP/hostname of the database server.
-* `T5_DATABASE_PORT` - Port number of Mark Logic HTTP REST API endpoint.
-* `T5_DATABASE_USER` - Database username.
-* `T5_DATABASE_PASSWORD` - Database password.
-* `T5_RDF_HOST` - IP/hostname of the triple store.
-* `T5_RDF_PORT` - Port number of the triple store.
-* `T5_RDF_GRAPH` - Graph name prefix to use for storing triplified HL7 messages.
-* `T5_RDF_USER` - Triple store username.
-* `T5_RDF_PASSWORD` - Triple store password.
-* `T5_DATABASE_XCC_NAME`- Name of the database schema 
-* `T5_DATABASE_XCC_PORT`- Port number of XCC endpoint.
-* `T5_DATA_INJECTION_ENABLED`- Enable/Disable device identification injection.
+* `JDBC_CONNECTION_STRING` - A string containing connection information such as hostname/IP, username, password and other connection settings accepted by the Postgres JDBC driver. All application data will be stored in this database.
+* `T5_RDF_HOST` - (Optional) IP/hostname of the triple store.
+* `T5_RDF_PORT` - (Optional) Port number of the triple store.
+* `T5_RDF_GRAPH` - (Optional) Graph name prefix to use for storing triplified HL7 messages.
+* `T5_RDF_USER` - (Optional) Triple store username.
+* `T5_RDF_PASSWORD` - (Optional) Triple store password.
+* `T5_DATA_INJECTION_ENABLED`- Enable/Disable device identification injection. Valid values are `true` and `false`.
+* `T5_TIME_ADJUSTMENT_ENABLED` - (Optional) Enable/disable assumption of a time zone other than that of the machine on which the application is running when dealing with messages that does not specify a time zone. Valid values are `true` and `false`.
+* `T5_DEFAULT_TIME_ZONE` - (Optional) The time zone to assume for incoming message that does not specify a time zone.
+
 
 ## References
 * HL7v2 http://www.hl7.org/implement/standards/product_brief.cfm?product_id=185
