@@ -57,10 +57,14 @@ SELECT fhir_create_storage('{"resourceType": "MedicationOrder"}');
 SELECT fhir_create_storage('{"resourceType": "Procedure"}');
 SELECT fhir_create_storage('{"resourceType": "DiagnosticReport"}');
 SELECT fhir_create_storage('{"resourceType": "Condition"}');
+SELECT fhir_create_storage('{"resourceType": "Order"}');
+SELECT fhir_create_storage('{"resourceType": "DeviceMetric"}');
+SELECT fhir_create_storage('{"resourceType": "List"}');
 
 SELECT fhir_create_resource(
 $$
 {
+"allowId":true,
 "resource": {
  "resourceType": "SearchParameter",
  "id": "ReferralRequest--encounter",
@@ -82,6 +86,7 @@ $$
 SELECT fhir_create_resource(
 $$
 {
+"allowId":true,
 "resource": {
  "resourceType": "SearchParameter",
  "id": "ReferralRequest--supporting-information",
@@ -103,6 +108,7 @@ $$
 SELECT fhir_create_resource(
 $$
 {
+"allowId":true,
 "resource": {
  "resourceType": "SearchParameter",
  "id": "Encounter--service-provider",
@@ -124,6 +130,7 @@ $$
 SELECT fhir_create_resource(
 $$
 {
+"allowId":true,
 "resource": {
  "resourceType": "SearchParameter",
  "id": "DeviceUseStatement-start",
@@ -145,6 +152,7 @@ $$
 SELECT fhir_create_resource(
 $$
 {
+"allowId":true,
 "resource": {
  "resourceType": "SearchParameter",
  "id": "DeviceUseStatement-end",
@@ -166,6 +174,7 @@ $$
 SELECT fhir_create_resource(
 $$
 {
+"allowId":true,
 "resource": {
  "resourceType": "SearchParameter",
  "id": "DeviceUseStatement--period",

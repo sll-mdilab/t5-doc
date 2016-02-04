@@ -88,7 +88,7 @@ public class T5RouteBuilder extends RouteBuilder {
 			.process("dataInjectionProcessor")			
 			.log(LoggingLevel.INFO, "Extracting device IDs.")
 			.process("deviceIdScannerProcessor")
-			.inOnly("seda:hl7Brokering")
+//			.inOnly("seda:hl7Brokering")
 			.log(LoggingLevel.INFO, "Scanning for waveform message.")
 			.process("waveformScannerProcessor")
 			.log(LoggingLevel.INFO, "Performing validation.")
