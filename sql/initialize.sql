@@ -60,6 +60,9 @@ SELECT fhir_create_storage('{"resourceType": "Condition"}');
 SELECT fhir_create_storage('{"resourceType": "Order"}');
 SELECT fhir_create_storage('{"resourceType": "DeviceMetric"}');
 SELECT fhir_create_storage('{"resourceType": "List"}');
+SELECT fhir_create_storage('{"resourceType": "Appointment"}');
+SELECT fhir_create_storage('{"resourceType": "QuestionnaireResponse"}');
+SELECT fhir_create_storage('{"resourceType": "Observation"}');
 
 SELECT fhir_create_resource(
 $$
@@ -193,6 +196,50 @@ $$
 $$
 );
 
+SELECT fhir_create_resource(
+$$
+{
+"allowId":true,
+"resource": {
+ "resourceType": "SearchParameter",
+ "id": "Observation--comments",
+ "url": "http://sll-mdilab.com/fhir/SearchParameter/Observation--comments",
+ "name": "-comments",
+ "publisher": "Karolinska University Hospital",
+ "date": "2016-02-18T14:07:00+00:00",
+ "code": "-comments",
+ "base": "Observation",
+ "type": "string",
+ "description": "Search by comments",
+ "xpath": "f:Observation/f:comments",
+ "xpathUsage": "normal"
+}
+}
+$$
+);
+
+SELECT fhir_create_resource(
+$$
+{
+"allowId":true,
+"resource": {
+ "resourceType": "SearchParameter",
+ "id": "Observation--method",
+ "url": "http://sll-mdilab.com/fhir/SearchParameter/Observation--method",
+ "name": "-method",
+ "publisher": "Karolinska University Hospital",
+ "date": "2016-02-19T14:07:00+00:00",
+ "code": "-method",
+ "base": "Observation",
+ "type": "token",
+ "description": "Search by method",
+ "xpath": "f:Observation/f:method",
+ "xpathUsage": "normal"
+}
+}
+$$
+);
+
 SELECT fhir_index_parameter('{"resourceType": "EpisodeOfCare", "name": "team-member"}');
 SELECT fhir_index_parameter('{"resourceType": "EpisodeOfCare", "name": "status"}');
 
@@ -211,9 +258,17 @@ SELECT fhir_index_parameter('{"resourceType": "DeviceUseStatement", "name": "pat
 SELECT fhir_index_parameter('{"resourceType": "DeviceUseStatement", "name": "subject"}');
 SELECT fhir_index_parameter('{"resourceType": "DeviceUseStatement", "name": "start"}');
 SELECT fhir_index_parameter('{"resourceType": "DeviceUseStatement", "name": "end"}');
+SELECT fhir_index_parameter('{"resourceType": "DeviceUseStatement", "name": "-period"}');
 
 SELECT fhir_index_parameter('{"resourceType": "Patient", "name": "identifier"}');
 SELECT fhir_index_parameter('{"resourceType": "Patient", "name": "name"}');
+
+SELECT fhir_index_parameter('{"resourceType": "Observation", "name": "-comments"}');
+SELECT fhir_index_parameter('{"resourceType": "Observation", "name": "subject"}');
+SELECT fhir_index_parameter('{"resourceType": "Observation", "name": "performer"}');
+SELECT fhir_index_parameter('{"resourceType": "Observation", "name": "-method"}');
+SELECT fhir_index_parameter('{"resourceType": "Observation", "name": "date"}');
+SELECT fhir_index_parameter('{"resourceType": "Observation", "name": "code"}');
 
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO t5user;
 GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO t5user;

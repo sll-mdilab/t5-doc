@@ -1,8 +1,5 @@
 package net.sllmdilab.t5.config;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
 import javax.sql.DataSource;
 
 import org.apache.camel.component.hl7.HL7DataFormat;
@@ -20,14 +17,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import com.marklogic.client.DatabaseClient;
-import com.marklogic.client.DatabaseClientFactory;
-import com.marklogic.client.DatabaseClientFactory.Authentication;
-import com.marklogic.client.document.XMLDocumentManager;
-import com.marklogic.xcc.ContentSource;
-import com.marklogic.xcc.ContentSourceFactory;
-import com.marklogic.xcc.exceptions.XccConfigException;
-
 import ca.uhn.hl7v2.DefaultHapiContext;
 import ca.uhn.hl7v2.HapiContext;
 import ca.uhn.hl7v2.conf.check.DefaultValidator;
@@ -35,7 +24,6 @@ import ca.uhn.hl7v2.conf.check.Validator;
 import ca.uhn.hl7v2.conf.parser.ProfileParser;
 import ca.uhn.hl7v2.conf.spec.RuntimeProfile;
 import ca.uhn.hl7v2.parser.CanonicalModelClassFactory;
-import net.sllmdilab.commons.database.MLDBClient;
 import net.sllmdilab.commons.exceptions.RosettaInitializationException;
 import net.sllmdilab.commons.t5.validators.RosettaValidator;
 import net.sllmdilab.t5.converters.PCD_01MessageToXMLConverter;
@@ -48,24 +36,6 @@ public class ApplicationConfiguration extends CamelConfiguration {
 
 	@Value("${JDBC_CONNECTION_STRING}")
 	private String jdbcConnectionString;
-	
-	@Value("${T5_DATABASE_HOST}")
-	private String databaseHost;
-
-	@Value("${T5_DATABASE_PORT}")
-	private String databasePort;
-
-	@Value("${T5_DATABASE_USER}")
-	private String databaseUser;
-
-	@Value("${T5_DATABASE_PASSWORD}")
-	private String databasePassword;
-
-	@Value("${T5_DATABASE_XCC_PORT}")
-	private String databaseXccPort;
-
-	@Value("${T5_DATABASE_XCC_NAME}")
-	private String databaseXccName;
 
 	@Value("${T5_TIME_ADJUSTMENT_ENABLED}")
 	private boolean timeAdjustmentEnabled;
@@ -92,19 +62,6 @@ public class ApplicationConfiguration extends CamelConfiguration {
 		HL7MLLPNettyDecoderFactory factory = new HL7MLLPNettyDecoderFactory();
 		factory.setConvertLFtoCR(true);
 		return factory;
-	}
-
-	@Bean
-	public DatabaseClient databaseClient() {
-		logger.info("Using database " + databaseUser + "@" + databaseHost + ":" + databasePort);
-
-		return DatabaseClientFactory.newClient(databaseHost, Integer.parseInt(databasePort), databaseUser,
-				databasePassword, Authentication.DIGEST);
-	}
-
-	@Bean
-	public XMLDocumentManager xmlDocumentManager() {
-		return databaseClient().newXMLDocumentManager();
 	}
 
 	@Bean
@@ -143,17 +100,6 @@ public class ApplicationConfiguration extends CamelConfiguration {
 	@Bean
 	public RosettaValidator rosettaValidator() throws RosettaInitializationException {
 		return new RosettaValidator();
-	}
-
-	@Bean
-	public ContentSource contentSource() throws URISyntaxException, XccConfigException {
-		return ContentSourceFactory.newContentSource(new URI("xcc://" + databaseUser + ":" + databasePassword + "@"
-				+ databaseHost + ":" + databaseXccPort + "/" + databaseXccName));
-	}
-
-	@Bean
-	public MLDBClient mldbClient() throws XccConfigException, URISyntaxException {
-		return new MLDBClient(contentSource());
 	}
 
 	@Bean(name = "rivtaObservationsDataFormat")

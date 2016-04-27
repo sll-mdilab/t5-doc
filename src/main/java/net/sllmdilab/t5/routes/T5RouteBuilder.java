@@ -1,9 +1,7 @@
 package net.sllmdilab.t5.routes;
 
+import static org.apache.camel.builder.PredicateBuilder.and;
 import static org.apache.camel.component.hl7.HL7.ack;
-import net.sllmdilab.t5.processors.BrokeringRecipientListProcessor;
-import net.sllmdilab.t5.processors.ProfileValidationProcessor;
-import net.sllmdilab.t5.processors.WaveformScannerProcessor;
 
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
@@ -17,7 +15,8 @@ import org.springframework.stereotype.Component;
 
 import ca.uhn.hl7v2.AcknowledgmentCode;
 import ca.uhn.hl7v2.HL7Exception;
-import static org.apache.camel.builder.PredicateBuilder.*;
+import net.sllmdilab.t5.processors.ProfileValidationProcessor;
+import net.sllmdilab.t5.processors.WaveformScannerProcessor;
 
 @Component
 public class T5RouteBuilder extends RouteBuilder {
@@ -25,18 +24,6 @@ public class T5RouteBuilder extends RouteBuilder {
 
 	@Value("${T5_PORT}")
 	private String hl7Port;
-
-	@Value("${T5_DATABASE_USER}")
-	private String databaseUser;
-
-	@Value("${T5_DATABASE_PASSWORD}")
-	private String databasePassword;
-
-	@Value("${T5_DATABASE_HOST}")
-	private String databaseHost;
-
-	@Value("${T5_DATABASE_PORT}")
-	private String databasePort;
 
 	@Value("${T5_RDF_USER}")
 	private String rdfUser;
@@ -149,19 +136,6 @@ public class T5RouteBuilder extends RouteBuilder {
 				.log(LoggingLevel.INFO, "Saving triples to DB.")
 				.inOnly("virtuoso://" + rdfUser + ":" + rdfPassword + "@" + rdfHost +":" + rdfPort + "/" + rdfGraph)
 				.log(LoggingLevel.INFO, "Finished saving triples to DB.");
-		
-		// Pass message to defined recipients
-		from("seda:hl7Brokering")
-			.routeId("hl7BrokeringRoute")
-			.log(LoggingLevel.INFO, "Performing brokering.")
-			.process("patientIdentificationProcessor")
-			.process("brokeringRecipientListProcessor")
-			.marshal(hl7DataFormat)
-			.errorHandler(deadLetterChannel("seda:hl7DeadLetter")
-				.retryAttemptedLogLevel(LoggingLevel.INFO))
-			.recipientList(header(BrokeringRecipientListProcessor.RECIPIENT_LIST_HEADER))
-				.parallelProcessing()
-				.timeout(2000);
 		
 		// Handle undeliverable messages
 		from("seda:hl7DeadLetter")
