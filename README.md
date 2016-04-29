@@ -25,7 +25,7 @@ The ACK-messages sent in response by the server is also persisted as HL7v2 XML a
 ## Databases
 
 ### SQL Database
-The application requires access to a PostgerSQL>=v9.4 database in which to store ingested messages as well as outgoing ACK-messages.
+The application requires access to a PostgerSQL>=v9.4 database in which to store ingested messages as well as outgoing ACK-messages. The database must have the PLv8 version of Fhirbase installed, see [fhirbase-plv8](https://github.com/fhirbase/fhirbase-plv8). The version in use has commit id `128de806c25f60ccf80180dbd20d5439a8a5fbb1`, later versions may contain breaking changes.
 
 ### RDF triple store
 Optionally, the application can also store messages as RDF triples to aid further analysis and validation. This requires access to an OpenLink Virtuoso triple store. It has been tested with Virtuoso Open-Source Edition 7.2.1.
