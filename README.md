@@ -25,7 +25,17 @@ The ACK-messages sent in response by the server is also persisted as HL7v2 XML a
 ## Databases
 
 ### SQL Database
-The application requires access to a PostgerSQL>=v9.4 database in which to store ingested messages as well as outgoing ACK-messages. The database must have the PLv8 version of Fhirbase installed, see [fhirbase-plv8](https://github.com/fhirbase/fhirbase-plv8). This software is at the time of writing in rapid change. The version in use has commit id `128de806c25f60ccf80180dbd20d5439a8a5fbb1`, later versions may contain breaking changes.
+The application requires access to a PostgerSQL>=v9.4 database in which to store ingested messages as well as outgoing ACK-messages. The database must have the PLv8 version of Fhirbase installed, see [fhirbase-plv8](https://github.com/fhirbase/fhirbase-plv8). This software is at the time of writing in rapid change. The version in use has commit id `128de806c25f60ccf80180dbd20d5439a8a5fbb1`, later versions may contain breaking changes. The PLv8 itself is pre-installed on some distributions of PostgreSQL, see (this page )[http://pgxn.org/dist/plv8/] for more information on PLv8 and installation instructions.
+
+#### Database setup
+A script for initializing all required database schema can be found at `sql/initialize.sql`. Make sure the database user has the correct permissions in order to create tables.
+
+Example usage:
+```
+psql [database name or connection uri] < sql/initialize.sql
+```
+
+See the internal [infrastructure](https://github.com/sll-mdilab/infrastructure/tree/master/database/fhir-data-reset) repository for setting up a basic set of data for demo-purpouses.
 
 ### RDF triple store
 Optionally, the application can also store messages as RDF triples to aid further analysis and validation. This requires access to an OpenLink Virtuoso triple store. It has been tested with Virtuoso Open-Source Edition 7.2.1.
@@ -40,13 +50,6 @@ Assuming that Java EE 8 development kit is installed and exist on the PATH envir
     ./gradlew build
 
 This outputs a .war-file into the `build/lib` directory.
-
-## Database setup
-A script for initializing all required database schema can be found at `sql/initialize.sql`.
-Example usage:
-```
-psql [database name or connection uri] < sql/initialize.sql
-```
 
 ## Deployment
 The build process produces a servlet contained in a .war-file which can be deployed on any compatible Java servlet container. It has been tested with Apache Tomcat 8.0.
