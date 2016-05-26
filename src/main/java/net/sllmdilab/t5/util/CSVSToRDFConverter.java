@@ -152,7 +152,7 @@ public class CSVSToRDFConverter {
 					// If integer or double
 					if (propValue.indexOf(".") == -1) {
 						// Integer
-						Integer ival = new Integer((int) fval.floatValue());
+						Long ival = new Long((long) fval.doubleValue());
 						ind.addLiteral(ontProps[k], ival);
 					} else {
 						ind.addLiteral(ontProps[k], fval);
@@ -228,7 +228,7 @@ public class CSVSToRDFConverter {
 		}
 
 		int keyColIndex = -1;
-		if (args.length > 6 && !args[5].equals("null")) {
+		if (args.length > 6 && !args[6].equals("null")) {
 			keyColIndex = new Integer(args[6]).intValue();
 		}
 
